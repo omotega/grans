@@ -1,15 +1,23 @@
 import app from './app'
 import dotenv from 'dotenv'
-
 dotenv.config();
 
-const port = process.env.PORT
+import { Dbconnection } from './models/dbconnection'
 
-const server = app.listen(port, () => {
+
+const port = process.env.PORT || 6666;
+
+ app.listen(port, async () => {
   console.log(`server connected on port ${port}`);
+  try {
+    await Dbconnection.authenticate();
+    console.log('database connected')
+  } catch (error: any) {
+    console.log(error.message);
+  }
 })
 
 process.on('unhandledRejection', (error: any) => {
   console.log(`unhandledRejection: ${error.message}`)
-  server.close(() => process.exit(1));
+  process.exit(1);
 })
