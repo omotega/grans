@@ -1,5 +1,3 @@
-import { stat } from "fs";
-
 export class BaseError extends Error {
   statusCode: number;
   isOperational: boolean;
