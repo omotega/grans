@@ -7,7 +7,7 @@ export const registerValidation = (user: Iuser) => {
     email: joi.string().email().required(),
     password: joi
       .string()
-      .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$"))
+      // .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$"))
       .required(),
   });
   return schema.validate(user);
