@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import {  BaseError } from "../errors/apperrors";
+import {  BadRequestError, BaseError } from "../errors/apperrors";
 
 const sendErrorInDev = (errObj: any, res: Response) => {
   console.log(errObj);
@@ -11,7 +11,15 @@ const sendErrorInDev = (errObj: any, res: Response) => {
   });
 };
 
-const sendErrorInProduction = (errObj: any, res: Response) => {
+const sendErrorInProduction = (errObj: any, res: Response) => { 
+  if(errObj.name = 'ForbiddenError' && errObj?.error.code === 'EBADCSRFTOKEN') {
+    errObj = new BadRequestError('an error occurred when connecting to a external service ',500);
+  }
+  if(errObj?.error) {
+    if(errObj?.error.code === 'ENOTFOUND' || errObj?.error.code === 'ECONNRESET') {
+      errObj = new BaseError('an error occurred while connecting to a external service ');
+    }
+  }
   res.status(errObj.statusCode).json({ status: errObj.status, message: errObj.message });
 };
 
