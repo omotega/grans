@@ -1,5 +1,6 @@
 import argon from "argon2";
 import jwt from "jsonwebtoken";
+import Otp from "otp-generator";
 
 /**
  * contains all the helper methods
@@ -11,11 +12,11 @@ class Helper {
    * @params the user password to be hashed
    * @return the hashed user password
    */
-  static async hashPasswod(password: string) {
+  static async hashPassword(password: string) {
     const hashedpassword = await argon.hash(password);
     return hashedpassword;
   }
-  
+
   /**
    * it compared the user password and the hashed password
    * @params the user password
@@ -44,5 +45,21 @@ class Helper {
    */
   static async decodeToken(token: any) {
     const payload = await jwt.verify(token, process.env.JWT_SECRET as string);
+    return payload
+  }
+
+  /**
+   * this is to geberate otp for the user
+   */
+  static generateOtp() {
+    const otp = Otp.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    })
+    return otp;
   }
 }
+
+export default Helper
