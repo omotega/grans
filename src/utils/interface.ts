@@ -3,7 +3,8 @@ export interface Iuser {
   name: string;
   password: string;
   email: string;
-  active?: string;
+  active?: boolean;
+  verified?:boolean;
   photo?: string
   createdAt?: Date;
   updatedAt?: Date;
