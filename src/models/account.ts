@@ -4,24 +4,23 @@ import db from './index';
 
 class Account extends Model<Iaccount> {
   declare id: number;
-  declare wallet_id: string;
-  declare user_id: number;
+  declare userId: number;
   declare balance: number;
+
+  static associate(models:any) {
+    Account.belongsTo(models.Users);
+  }
+
 }
 
 Account.init({
   id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
     autoIncrement: true,
     primaryKey: true,
-  },
-  wallet_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
     unique: true,
   },
-  user_id: {
+  userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     unique: true,
