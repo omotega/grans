@@ -44,17 +44,19 @@ export const Register = async (req: Request, res: Response) => {
 };
 
 export const verify = async (req: Request, res: Response) => {
+  const t = await db.transaction()
   try {
     const { otp, email } = req.body;
     const user = await User.findOne({
       where: { email },
-      attributes: { exclude: ["password"] },
+      attributes: { exclude: ["password"] }, transaction:t
     });
-    const isOtp = await Otp.findOne({ where: { token: otp } });
+    const isOtp = await Otp.findOne({ where: { token: otp },transaction:t });
     if (!isOtp) throw new NotFoundError("otp not found");
     if (isOtp.expired != false) throw new BadRequestError("otp has expired");
     await user?.update({ verified: true });
     await isOtp.update({ expired: true });
+    await t.commit()
     return successResponse(
       res,
       200,
@@ -62,8 +64,38 @@ export const verify = async (req: Request, res: Response) => {
       user
     );
   } catch (error) {
+    await t.rollback();
     handleError(req, error);
     throw new ServerError("Something went wrong");
   }
 };
 
+export const login = async (req: Request, res: Response) => {
+  const t = await db.transaction();
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({where: { email },transaction:t });
+    if (!user) throw new NotFoundError("user not found");
+    if (!user.verified)
+      throw new BadRequestError("please verify your account before logging");
+    if (!user.active)
+      throw new BadRequestError(
+        "user account deactivated,kindly activate your account"
+      );
+    const isPassword = await Helper.comparePassword(user.password,password);
+    if (!isPassword) throw new BadRequestError("incorrect password");
+    const token = await Helper.generateToken({
+      id: user.id,
+      email: user.email,
+    });
+    await t.commit()
+    return successResponse(res, 200, "User logged in successfully", {
+      token,
+      user,
+    });
+  } catch (error) {
+    await t.rollback()
+    handleError(req, error);
+    throw new ServerError("Something went wrong");
+  }
+};
