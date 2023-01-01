@@ -31,7 +31,7 @@ class Helper {
    * @params  the user payload
    */
 
-  static async generateToken(payload: any) {
+  static async generateToken(payload: string) {
     const token = await jwt.sign(payload, process.env.JWT_SECRET as string, {
       expiresIn: "3h",
     });
@@ -43,16 +43,16 @@ class Helper {
    * @params token
    * @returns payload
    */
-  static async decodeToken(token: any) {
+  static async decodeToken(token: string) {
     const payload = await jwt.verify(token, process.env.JWT_SECRET as string);
     return payload
   }
 
   /**
-   * this is to geberate otp for the user
+   * this is to generate otp for the user
    */
   static generateOtp() {
-    const otp = Otp.generate(6, {
+    let otp = Otp.generate(6, {
       digits: true,
       lowerCaseAlphabets: false,
       upperCaseAlphabets: false,
