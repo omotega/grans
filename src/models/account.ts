@@ -19,6 +19,7 @@ Account.init({
     autoIncrement: true,
     primaryKey: true,
     unique: true,
+    allowNull:false,
   },
   userId: {
     type: DataTypes.INTEGER,
