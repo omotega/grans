@@ -24,6 +24,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("welcome to this wallet application");
 });
 
+app.use(ErrorHandler);
+
+app.use("/api", userRouter);
+
 app.use((req: Request, res: Response) => {
   res.status(404).send({
     status: "error",
@@ -31,9 +35,5 @@ app.use((req: Request, res: Response) => {
     message: "Route not correct,kindly check url",
   });
 });
-
-app.use(ErrorHandler);
-
-app.use("/api", userRouter);
 
 export default app;
