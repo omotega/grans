@@ -21,7 +21,7 @@ class Helper {
    * it compared the user password and the hashed password
    * @params the user password
    */
-  static async comparePassword(password: string, hashedpassword: string) {
+  static async comparePassword(hashedpassword: string,password: string) {
     const isMatch = await argon.verify(hashedpassword, password);
     return isMatch;
   }
@@ -31,7 +31,7 @@ class Helper {
    * @params  the user payload
    */
 
-  static async generateToken(payload: string) {
+  static async generateToken(payload: any) {
     const token = await jwt.sign(payload, process.env.JWT_SECRET as string, {
       expiresIn: "3h",
     });
@@ -43,7 +43,7 @@ class Helper {
    * @params token
    * @returns payload
    */
-  static async decodeToken(token: string) {
+  static async decodeToken(token: any) {
     const payload = await jwt.verify(token, process.env.JWT_SECRET as string);
     return payload
   }
