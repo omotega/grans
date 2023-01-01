@@ -2,7 +2,7 @@ import { Model, DataTypes } from "sequelize";
 import { Iuser } from "../utils/interface";
 import db from './index';
 import Otp from './otp';
-import Account from './account';
+
 
 class User extends Model<Iuser> {
   declare id: number;
@@ -10,7 +10,19 @@ class User extends Model<Iuser> {
   declare email: string;
   declare password: string;
   declare active: boolean;
+  declare verified: boolean;
   declare phone: string;
+  declare role:string;
+
+  static associate (models:any) {
+    User.hasOne(models.Otps,{
+      foreignKey:'email',
+    });
+    User.hasOne(models.Accounts,{
+      sourceKey: 'id',
+      foreignKey:'accountId',
+    });
+  }
 
 }
 
@@ -19,7 +31,7 @@ User.init({
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
-    allowNull: false
+    unique: true,
   },
   name: {
     type: DataTypes.STRING,
@@ -38,27 +50,26 @@ User.init({
   active: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
+    defaultValue: true,
+  },
+  verified:{
+    type:DataTypes.BOOLEAN,
+    allowNull: false,
     defaultValue: false,
   },
   photo: {
     type: DataTypes.STRING,
   },
+  role:{
+    type:DataTypes.ENUM,
+    values:['admin','vendor','user'],
+    defaultValue:'user',
+  },
+
 }, {
   sequelize: db,
   tableName: "Users",
   underscored: false,
 });
-
-User.hasMany(Otp,{
-  as:'Otps',
-  foreignKey:"email",
-  onDelete:"cascade",
-})
-
-// User.hasOne(Account,{
-//   sourceKey:'id',
-//   foreignKey:'wallet_id',
-//   as:'User'
-// })
 
 export default User;
