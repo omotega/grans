@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Restaurants', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -14,33 +14,26 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      email: {
+      state: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
       },
-      password: {
+      city: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
       },
-      active: {
+      address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      isOpen: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
-      },
-      verified:{
-        type:Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      photo: {
-        type: Sequelize.STRING,
-      },
-      role:{
-        type:Sequelize.ENUM,
-        values:['admin','vendor','user'],
-        defaultValue:'user',
       },
       createdAt: {
         allowNull: false,
@@ -51,10 +44,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW'),
+
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Restaurants');
   }
 };

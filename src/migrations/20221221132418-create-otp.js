@@ -7,6 +7,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
+        unique: true,
         type: Sequelize.INTEGER
       },
       email: {
@@ -20,8 +21,13 @@ module.exports = {
         allowNull: false,
         unique:true,
       },
+      expiry_time:{
+        type:Sequelize.DATE,
+        allowNull:false,
+        defaultValue: Sequelize.fn('NOW')
+      },
       expired: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
     
