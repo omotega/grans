@@ -17,14 +17,31 @@ export const guard = async (
     if (req.headers && req.headers.authorization) {
       const token = req.headers.authorization.split(" ")[1];
       const decode: any = await Helper.decodeToken(token);
-      const user = await User.findByPk(decode.id);
+      const { id } = decode;
+      const user = await User.findOne({ where: { id } });
       if (!user) throw new NotFoundError("user not found");
-      req.user = user;
+      req.User = user;
       return next();
     } else {
       throw new UnauthorizedError("Authorization not found");
     }
-  } catch (error:any) {
+  } catch (error: any) {
+    handleError(req, error);
+    throw new ServerError("Something went wrong");
+  }
+};
+
+export const verifyAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.User;
+    const user = await User.findOne({ where: { id, role: 'admin' } });
+    if (!user) throw new UnauthorizedError("user not an admin,not authorized");
+    return next();
+  } catch (error) {
     handleError(req, error);
     throw new ServerError("Something went wrong");
   }
