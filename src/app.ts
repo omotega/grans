@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import ErrorHandler from "./middleware/errormiddleware";
 import { CustomRequest } from "./utils/interface";
 import userRouter from "./routes/user";
+import adminRouter from "./routes/admin";
 
 dotenv.config();
 const port = process.env.PORT;
@@ -27,6 +28,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use(ErrorHandler);
 
 app.use("/api", userRouter);
+app.use('/api',adminRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).send({
