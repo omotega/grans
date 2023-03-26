@@ -7,25 +7,52 @@ import {
   UnauthorizedError,
 } from "../errors/apperrors";
 import { handleError } from "../utils/response";
+import { get } from "lodash";
+import config from "../config/config";
+import Session from "../models/session";
+import { reIssueAccessToken } from "../services/session";
 
 export const guard = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const accessToken = req.cookies.accessToken;
+
+  const refreshToken = req.cookies.refreshToken;
   try {
-    if (req.headers && req.headers.authorization) {
-      const token = req.headers.authorization.split(" ")[1];
-      const decode: any = await Helper.decodeToken(token);
-      const { id } = decode;
-      const user = await User.findOne({ where: { id } });
-      if (!user) throw new NotFoundError("user not found");
-      req.User = user;
+    let newAccessToken;
+    let payload;
+    const result: any = Helper.decodeToken(
+      refreshToken,
+      config.REFRESH_TOKEN_SECRET
+    );
+    console.log("accessToken1");
+    if (accessToken === undefined && refreshToken === undefined) {
+      throw new UnauthorizedError("please login");
+    } else if (accessToken === undefined && result.expired === false) {
+      newAccessToken = await reIssueAccessToken(refreshToken);
+      if (!newAccessToken) return next();
+      req.cookies.accessToken = newAccessToken;
+      const newToken = Helper.decodeToken(
+        newAccessToken,
+        config.ACCESS_TOKEN_SECRET
+      );
+      // @ts-ignore
+      req.User = newToken.payload;
       return next();
     } else {
-      throw new UnauthorizedError("Authorization not found");
+      payload = Helper.decodeToken(accessToken, config.ACCESS_TOKEN_SECRET);
+      if (payload) {
+        // @ts-ignore
+        req.User = payload.payload;
+        console.log("accessToken5");
+        return next();
+      }
     }
-  } catch (error: any) {
+
+    return next();
+  } catch (error) {
     handleError(req, error);
     throw new ServerError("Something went wrong");
   }
@@ -38,7 +65,7 @@ export const verifyAdmin = async (
 ) => {
   try {
     const { id } = req.User;
-    const user = await User.findOne({ where: { id, role: 'admin' } });
+    const user = await User.findOne({ where: { id, role: "admin" } });
     if (!user) throw new UnauthorizedError("user not an admin,not authorized");
     return next();
   } catch (error) {
