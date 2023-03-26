@@ -1,8 +1,6 @@
 import { Model, DataTypes } from "sequelize";
 import { Iuser } from "../utils/interface";
 import db from './index';
-import Otp from './otp';
-
 
 class User extends Model<Iuser> {
   declare id: number;
@@ -12,20 +10,25 @@ class User extends Model<Iuser> {
   declare active: boolean;
   declare verified: boolean;
   declare phone: string;
-  declare role:string;
+  declare role: string;
+  declare createdAt: Date;
+  declare updatedAt: Date;
 
-  static associate (models:any) {
-    User.hasOne(models.Otps,{
-      foreignKey:'email',
+  static associate(models: any) {
+    User.hasOne(models.Otps, {
+      foreignKey: 'email',
     });
-    User.hasOne(models.Accounts,{
+    User.hasOne(models.Accounts, {
       sourceKey: 'id',
-      foreignKey:'accountId',
+      foreignKey: 'accountId',
+    });
+    User.hasOne(models.Sessions, {
+      sourceKey: 'id',
+      foreignKey: 'user',
     });
   }
 
 }
-
 User.init({
   id: {
     type: DataTypes.INTEGER,
@@ -52,18 +55,26 @@ User.init({
     allowNull: false,
     defaultValue: true,
   },
-  verified:{
-    type:DataTypes.BOOLEAN,
+  verified: {
+    type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   },
   photo: {
     type: DataTypes.STRING,
   },
-  role:{
-    type:DataTypes.ENUM,
-    values:['admin','vendor','user'],
-    defaultValue:'user',
+  role: {
+    type: DataTypes.ENUM,
+    values: ['admin', 'vendor', 'user'],
+    defaultValue: 'user',
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
   },
 
 }, {
