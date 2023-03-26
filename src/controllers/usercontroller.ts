@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import User from "../models/user";
 import Otp from "../models/otp";
 import Account from "../models/account";
+import Session from "../models/session";
 import db from "../models/index";
+import config from "../config/config";
 import {
   BadRequestError,
   DuplicateError,
@@ -13,6 +15,7 @@ import {
 import Helper from "../utils/helper";
 import sendEmail from "../utils/sendEmail";
 import { handleError, successResponse } from "../utils/response";
+import { Isession, Iuser } from "../utils/interface";
 
 export const Register = async (req: Request, res: Response) => {
   const t = await db.transaction();
@@ -35,20 +38,14 @@ export const Register = async (req: Request, res: Response) => {
     const subject = "User created";
     const message = `hi,thank you for signing up .Kindly verify your account with this token ${otp}`;
     await sendEmail(email, subject, message);
-    const details = {
-      name: user.name,
-      email: user.email,
-      active: user.active,
-      verified: user.verified,
-      role: user.role,
-    };
+    const result = Helper.excludeFields(["password"], user.dataValues);
     await t.commit();
 
     return successResponse(
       res,
       201,
       "Account created successfully,kindly verify your email and login",
-      details
+      result
     );
   } catch (error) {
     await t.rollback();
@@ -69,16 +66,10 @@ export const verify = async (req: Request, res: Response) => {
     const isOtp = await Otp.findOne({ where: { token: otp }, transaction: t });
     if (!isOtp) throw new NotFoundError("otp not found");
     if (isOtp.expired != false) throw new BadRequestError("otp has expired");
-    await user?.update({ verified: true} ,{transaction:t});
-    await isOtp.update({ expired: true },{transaction:t});
+    await user?.update({ verified: true }, { transaction: t });
+    await isOtp.update({ expired: true }, { transaction: t });
 
-    const details = {
-      name: user?.name,
-      email: user?.email,
-      active: user?.active,
-      verified: user?.verified,
-      role: user?.role,
-    };
+    const details = Helper.excludeFields(["password"], user?.dataValues);
     await t.commit();
     return successResponse(
       res,
@@ -107,20 +98,47 @@ export const login = async (req: Request, res: Response) => {
       );
     const isPassword = await Helper.comparePassword(user.password, password);
     if (!isPassword) throw new BadRequestError("incorrect password");
-    const token = await Helper.generateToken({
-      id: user.id,
-      email: user.email,
+  
+    const session = await Session.create(
+      { user: user.dataValues.id, },
+      { transaction: t }
+    );
+
+    const accessToken = await Helper.generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        role:user.role,
+        session: session.dataValues.id
+      },
+      config.ACCESS_TOKEN_SECRET
+    );
+
+    const refreshToken = await Helper.generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        role:user.role,
+        session: session.dataValues.id,
+      },
+      config.REFRESH_TOKEN_SECRET
+    );
+
+    res.cookie("accessToken", accessToken, {
+      maxAge: 900000,
+      httpOnly: true,
+      path: "/",
     });
-    const details = {
-      name: user.name,
-      email: user.email,
-      active: user.active,
-      verified: user.verified,
-      role: user.role,
-    };
+    res.cookie("refreshToken", refreshToken, {
+      maxAge: 3.154e10,
+      httpOnly: true,
+      path: "/",
+    });
+   
+    const details = Helper.excludeFields(["password"], user.dataValues);
     await t.commit();
     return successResponse(res, 200, "User logged in successfully", {
-      details,token
+      details,
     });
   } catch (error) {
     await t.rollback();
@@ -133,7 +151,7 @@ export const updateProfile = async (req: Request, res: Response) => {
   const t = await db.transaction();
   try {
     const { name, email, password } = req.body;
-    const { id } = req.User;
+    const { id }  = req.User;
     const user = await User.findOne({ where: { id }, transaction: t });
     if (!user) throw new NotFoundError("user not found");
     if (user.id != id) throw new UnauthorizedError("user not authorized");
@@ -142,13 +160,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       { name: name, password: hash, email: email },
       { transaction: t }
     );
-    const details = {
-      name: user.name,
-      email: user.email,
-      active: user.active,
-      verified: user.verified,
-      role: user.role,
-    };
+    const details = Helper.excludeFields(["password"], user.dataValues);
     await t.commit();
     return successResponse(
       res,
@@ -163,3 +175,7 @@ export const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
+export const logOut = async(req:Request,res:Response) => {
+  res.clearCookie('accessToken')
+  res.send('cookie deleted')
+}
