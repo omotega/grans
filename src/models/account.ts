@@ -6,6 +6,8 @@ class Account extends Model<Iaccount> {
   declare id: number;
   declare userId: number;
   declare balance: number;
+  declare createdAt: Date;
+  declare updatedAt: Date;
 
   static associate(models:any) {
     Account.belongsTo(models.Users);
@@ -30,6 +32,14 @@ Account.init({
     type: DataTypes.FLOAT,
     allowNull: false,
 
+  },
+  createdAt:{
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  updatedAt:{
+    type: DataTypes.DATE,
+    allowNull: false,
   }
 }, {
   sequelize: db,
