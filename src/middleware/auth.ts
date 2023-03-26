@@ -18,7 +18,6 @@ export const guard = async (
   next: NextFunction
 ) => {
   const accessToken = req.cookies.accessToken;
-
   const refreshToken = req.cookies.refreshToken;
   try {
     let newAccessToken;
@@ -50,7 +49,6 @@ export const guard = async (
         return next();
       }
     }
-
     return next();
   } catch (error) {
     handleError(req, error);
