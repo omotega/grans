@@ -7,6 +7,8 @@ class Otp extends Model<Iotp> {
   declare email: string;
   declare token: string;
   declare expired: boolean;
+  declare createdAt: Date;
+  declare updatedAt: Date;
 
   static associate(models:any) {
     Otp.belongsTo(models.Users);
@@ -38,6 +40,14 @@ Otp.init({
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
+  },
+  createdAt:{
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  updatedAt:{
+    type: DataTypes.DATE,
+    allowNull: false,
   }
 }, {
   sequelize: db,
