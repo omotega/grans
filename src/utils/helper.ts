@@ -1,6 +1,10 @@
 import argon from "argon2";
 import jwt from "jsonwebtoken";
 import Otp from "otp-generator";
+import config from "../config/config";
+
+const ACCESS_SECRET = config.ACCESS_TOKEN_SECRET;
+const REFRESH_SECRET = config.REFRESH_TOKEN_SECRET;
 
 /**
  * contains all the helper methods
@@ -21,7 +25,7 @@ class Helper {
    * it compared the user password and the hashed password
    * @params the user password
    */
-  static async comparePassword(hashedpassword: string,password: string) {
+  static async comparePassword(hashedpassword: string, password: string) {
     const isMatch = await argon.verify(hashedpassword, password);
     return isMatch;
   }
@@ -31,10 +35,11 @@ class Helper {
    * @params  the user payload
    */
 
-  static async generateToken(payload: any) {
-    const token = await jwt.sign(payload, process.env.JWT_SECRET as string, {
-      expiresIn: "3h",
+  static generateToken(payload: any, secret: string) {
+    const token = jwt.sign(payload, secret, {
+      expiresIn: "1h",
     });
+
     return token;
   }
 
@@ -43,11 +48,15 @@ class Helper {
    * @params token
    * @returns payload
    */
-  static async decodeToken(token: any) {
-    const payload = await jwt.verify(token, process.env.JWT_SECRET as string);
-    return payload
-  }
 
+  static decodeToken(token: any, secret: string) {
+    const payload = jwt.verify(token, secret);
+    return {
+      valid: true,
+      expired: false,
+      payload,
+    };
+  }
   /**
    * this is to generate otp for the user
    */
@@ -57,9 +66,21 @@ class Helper {
       lowerCaseAlphabets: false,
       upperCaseAlphabets: false,
       specialChars: false,
-    })
+    });
     return otp;
   }
+  /**
+   * utility function to exclude certain fields that should not be shown to the client
+   */
+
+  static excludeFields = (fields: string[], objects: any) => {
+    const exclude = new Set(fields);
+    const result = Object.fromEntries(
+      Object.entries(objects).filter((e) => !exclude.has(e[0]))
+    );
+
+    return result;
+  };
 }
 
-export default Helper
+export default Helper;
