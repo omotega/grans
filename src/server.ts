@@ -2,6 +2,8 @@ import app from './app'
 import dotenv from 'dotenv'
 dotenv.config();
 
+import logger from './logger/logger';
+
 import { Dbconnection } from './models/dbconnection'
 
 
@@ -11,13 +13,13 @@ const port = process.env.PORT || 6666;
   console.log(`server connected on port ${port}`);
   try {
     await Dbconnection.authenticate();
-    console.log('database connected')
+    logger.info('database connected')
   } catch (error: any) {
-    console.log(error.message);
+    logger.error(error.message);
   }
 })
 
 process.on('unhandledRejection', (error: any) => {
-  console.log(`unhandledRejection: ${error.message}`)
+  logger.info(`unhandledRejection: ${error.message}`)
   process.exit(1);
 })
