@@ -1,13 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../models/user";
 import Helper from "../utils/helper";
-import {
-  NotFoundError,
-  ServerError,
-  UnauthorizedError,
-} from "../errors/apperrors";
-import { handleError } from "../utils/response";
-import { get } from "lodash";
+import { errorResponse, handleError } from "../utils/response";
 import config from "../config/config";
 import Session from "../models/session";
 import { reIssueAccessToken } from "../services/session";
@@ -28,7 +22,7 @@ export const guard = async (
     );
     console.log("accessToken1");
     if (accessToken === undefined && refreshToken === undefined) {
-      throw new UnauthorizedError("please login");
+      return errorResponse(res, 400, "please login");
     } else if (accessToken === undefined && result.expired === false) {
       newAccessToken = await reIssueAccessToken(refreshToken);
       if (!newAccessToken) return next();
@@ -52,7 +46,7 @@ export const guard = async (
     return next();
   } catch (error) {
     handleError(req, error);
-    throw new ServerError("Something went wrong");
+    return errorResponse(res, 500, "Something went wrong");
   }
 };
 
@@ -64,10 +58,11 @@ export const verifyAdmin = async (
   try {
     const { id } = req.User;
     const user = await User.findOne({ where: { id, role: "admin" } });
-    if (!user) throw new UnauthorizedError("user not an admin,not authorized");
+    if (!user)
+      return errorResponse(res, 401, "user not an admin,not authorized");
     return next();
   } catch (error) {
     handleError(req, error);
-    throw new ServerError("Something went wrong");
+    return errorResponse(res, 500, "Something went wrong");
   }
 };
