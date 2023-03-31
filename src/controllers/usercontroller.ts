@@ -5,24 +5,16 @@ import Account from "../models/account";
 import Session from "../models/session";
 import db from "../models/index";
 import config from "../config/config";
-import {
-  BadRequestError,
-  DuplicateError,
-  NotFoundError,
-  ServerError,
-  UnauthorizedError,
-} from "../errors/apperrors";
 import Helper from "../utils/helper";
 import sendEmail from "../utils/sendEmail";
-import { handleError, successResponse } from "../utils/response";
-import { Isession, Iuser } from "../utils/interface";
+import { handleError, successResponse, errorResponse } from "../utils/response";
 
 export const Register = async (req: Request, res: Response) => {
   const t = await db.transaction();
   try {
     const { name, email, password, photo } = req.body;
     const isExist = await User.findOne({ where: { email }, transaction: t });
-    if (isExist) throw new DuplicateError("user already exist");
+    if (isExist) return errorResponse(res, 406, "user already exist");
     const hash = await Helper.hashPassword(password);
     const user = await User.create(
       { name, email, password: hash, photo },
@@ -50,7 +42,7 @@ export const Register = async (req: Request, res: Response) => {
   } catch (error) {
     await t.rollback();
     handleError(req, error);
-    throw new ServerError("Something went wrong");
+    return errorResponse(res, 500, "Something went wrong");
   }
 };
 
@@ -64,8 +56,9 @@ export const verify = async (req: Request, res: Response) => {
       transaction: t,
     });
     const isOtp = await Otp.findOne({ where: { token: otp }, transaction: t });
-    if (!isOtp) throw new NotFoundError("otp not found");
-    if (isOtp.expired != false) throw new BadRequestError("otp has expired");
+    if (!isOtp) return errorResponse(res, 404, "otp not found");
+    if (isOtp.expired != false)
+      return errorResponse(res, 400, "otp has expired");
     await user?.update({ verified: true }, { transaction: t });
     await isOtp.update({ expired: true }, { transaction: t });
 
@@ -80,7 +73,7 @@ export const verify = async (req: Request, res: Response) => {
   } catch (error) {
     await t.rollback();
     handleError(req, error);
-    throw new ServerError("Something went wrong");
+    return errorResponse(res, 500, "Something went wrong");
   }
 };
 
@@ -89,18 +82,24 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email }, transaction: t });
-    if (!user) throw new NotFoundError("user not found");
+    if (!user) return errorResponse(res, 404, "user not found");
     if (!user.verified)
-      throw new BadRequestError("please verify your account before logging");
+      return errorResponse(
+        res,
+        400,
+        "please verify your account before logging"
+      );
     if (!user.active)
-      throw new BadRequestError(
+      return errorResponse(
+        res,
+        400,
         "user account deactivated,kindly activate your account"
       );
     const isPassword = await Helper.comparePassword(user.password, password);
-    if (!isPassword) throw new BadRequestError("incorrect password");
-  
+    if (!isPassword) return errorResponse(res, 400, "incorrect password");
+
     const session = await Session.create(
-      { user: user.dataValues.id, },
+      { user: user.dataValues.id },
       { transaction: t }
     );
 
@@ -108,8 +107,8 @@ export const login = async (req: Request, res: Response) => {
       {
         id: user.id,
         email: user.email,
-        role:user.role,
-        session: session.dataValues.id
+        role: user.role,
+        session: session.dataValues.id,
       },
       config.ACCESS_TOKEN_SECRET
     );
@@ -118,7 +117,7 @@ export const login = async (req: Request, res: Response) => {
       {
         id: user.id,
         email: user.email,
-        role:user.role,
+        role: user.role,
         session: session.dataValues.id,
       },
       config.REFRESH_TOKEN_SECRET
@@ -134,7 +133,7 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       path: "/",
     });
-   
+
     const details = Helper.excludeFields(["password"], user.dataValues);
     await t.commit();
     return successResponse(res, 200, "User logged in successfully", {
@@ -143,7 +142,7 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     await t.rollback();
     handleError(req, error);
-    throw new ServerError("Something went wrong");
+    return errorResponse(res, 500, "Something went wrong");
   }
 };
 
@@ -151,10 +150,10 @@ export const updateProfile = async (req: Request, res: Response) => {
   const t = await db.transaction();
   try {
     const { name, email, password } = req.body;
-    const { id }  = req.User;
+    const { id } = req.User;
     const user = await User.findOne({ where: { id }, transaction: t });
-    if (!user) throw new NotFoundError("user not found");
-    if (user.id != id) throw new UnauthorizedError("user not authorized");
+    if (!user) return errorResponse(res, 404, "user not found");
+    if (user.id != id) return errorResponse(res, 401, "user not authorized");
     const hash = await Helper.hashPassword(password);
     await user.update(
       { name: name, password: hash, email: email },
@@ -171,11 +170,11 @@ export const updateProfile = async (req: Request, res: Response) => {
   } catch (error) {
     await t.rollback();
     handleError(req, error);
-    throw new ServerError("Something went wrong");
+    return errorResponse(res, 500, "Something went wrong");
   }
 };
 
-export const logOut = async(req:Request,res:Response) => {
-  res.clearCookie('accessToken')
-  res.send('cookie deleted')
-}
+export const logOut = async (req: Request, res: Response) => {
+  res.clearCookie("accessToken");
+  res.send("cookie deleted");
+};
