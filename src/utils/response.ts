@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 
+export function errorResponse(res: Response, statusCode: number, error: string) {
+  const resobj = { statusCode, error };
+  return res.status(statusCode).send(resobj);
+}
+
+
 export function successResponse(res: Response, statusCode: number, message: string, data: any = []) {
   const resObj = {  statusCode, message, data }
   return res.status(statusCode).send(resObj)
