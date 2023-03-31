@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
 import httpLogger from "./logger/httplogger";
-import ErrorHandler from "./middleware/errormiddleware";
 import { CustomRequest } from "./utils/interface";
 import userRouter from "./routes/user";
 import adminRouter from "./routes/admin";
@@ -31,7 +30,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
-app.use(ErrorHandler);
+
 
 
 app.use("/api", userRouter);
