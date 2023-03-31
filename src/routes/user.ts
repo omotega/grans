@@ -8,7 +8,7 @@ import { guard } from '../middleware/auth'
 
 userRouter.route('/users/signup').post(validateRegisterMiddleware,Register);
 userRouter.route('/users/verify').post(verify);
-userRouter.route('/users/login').get(loginMiddleware,guard,login);
+userRouter.route('/users/login').get(loginMiddleware,login);
 
 userRouter.route('/users/profile').patch(guard,updateProfile);
 userRouter.route('/users/logout').delete(logOut);
