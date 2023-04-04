@@ -45,63 +45,10 @@ export interface Iaccount {
   updatedAt?: Date;
 }
 
-export interface Ifood {
-  id?: number;
-  price?: number;
-  foodType?: string;
-  description?: string;
-  vendor?: Iuser;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface Irestaurant {
-  id?: number;
-  name?: string;
-  state?: string;
-  city?: string;
-  address?: string;
-  description?: string;
-  isOpen?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface Idelivery {
-  id?: number;
-  status: string;
-  message: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface Icart {
-  id?: number;
-  userId?: Iuser;
-  product?: [string];
-  bill?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface Iorder {
-  id?: number;
-  owner?: Iuser;
-  item?: [any];
-  totalAmount?: number;
-  paidAmount?: number;
-  canceledAt?: Date;
-  orderDate?: Date;
-  orderStatus?: string;
-  remark?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
 export interface Itransaction {
   id?: number;
   txnType?: string;
-  transactions?: string;
+  purpose?: string;
   amount?: number;
   accountId?: number;
   reference?: string;
@@ -110,4 +57,24 @@ export interface Itransaction {
   metadata?: object;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface IcardTransaction {
+  id?: number;
+  externalReference?: string;
+  accountId?: number;
+  amount?: number;
+  lastResponse?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface Icard {
+  accountid?:number,
+  pan?: string,
+  expiry_year?: string,
+  expiry_month?:string,
+  cvv?:string,
+  email?: string,
+  amount?:number,
 }
