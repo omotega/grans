@@ -30,7 +30,7 @@ export async function reIssueAccessToken(refreshToken: any) {
   return accessToken;
 }
 
-export function deleteSession(refreshToken: any) {
+export async function deleteSession(refreshToken: any) {
   const payload: any = Helper.decodeToken(
     refreshToken,
     config.REFRESH_TOKEN_SECRET
@@ -40,9 +40,10 @@ export function deleteSession(refreshToken: any) {
     return false;
   }
   const {  id,session } = payload.payload;
-  const sessions  =  Session.findByPk(session);
+  const sessions  = await  Session.findByPk(session);
   if (!sessions) {
     return false;
   }
+  const deleteSession = await Session.destroy({where:{id:sessions.dataValues.id}});
 }
 
