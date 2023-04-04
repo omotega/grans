@@ -8,6 +8,7 @@ import config from "../config/config";
 import Helper from "../utils/helper";
 import sendEmail from "../utils/sendEmail";
 import { handleError, successResponse, errorResponse } from "../utils/response";
+import { deleteSession } from "../services/session";
 
 export const Register = async (req: Request, res: Response) => {
   const t = await db.transaction();
@@ -134,6 +135,7 @@ export const login = async (req: Request, res: Response) => {
       path: "/",
     });
 
+
     const details = Helper.excludeFields(["password"], user.dataValues);
     await t.commit();
     return successResponse(res, 200, "User logged in successfully", {
@@ -175,6 +177,14 @@ export const updateProfile = async (req: Request, res: Response) => {
 };
 
 export const logOut = async (req: Request, res: Response) => {
-  res.clearCookie("accessToken");
-  res.send("cookie deleted");
+  try {
+    const refreshToken = req.cookies.refreshToken
+    const deletedsession = await deleteSession(refreshToken);
+    res.clearCookie("accessToken");
+    res.clearCookie('refreshToken');
+    return successResponse(res,200,'User logged out');
+  } catch (error) {
+    handleError(req, error);
+    return errorResponse(res, 500, "Something went wrong");
+  }
 };
