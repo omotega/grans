@@ -5,9 +5,7 @@ import cookieParser from "cookie-parser";
 
 import httpLogger from "./logger/httplogger";
 import { CustomRequest } from "./utils/interface";
-import userRouter from "./routes/user";
-import adminRouter from "./routes/admin";
-import { guard }  from './middleware/auth'
+import route from './routes/index';
 
 dotenv.config();
 
@@ -30,11 +28,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
-
-
-
-app.use("/api", userRouter);
-app.use("/api", adminRouter);
+app.use("/api", route.userRouter);
+app.use("/api", route.adminRouter);
+app.use('/api', route.cardTransactionRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).send({
