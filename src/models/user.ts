@@ -65,7 +65,7 @@ User.init({
   },
   role: {
     type: DataTypes.ENUM,
-    values: ['admin', 'vendor', 'user'],
+    values: ['admin', 'user'],
     defaultValue: 'user',
   },
   createdAt: {
