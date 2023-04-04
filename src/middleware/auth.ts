@@ -20,7 +20,6 @@ export const guard = async (
       refreshToken,
       config.REFRESH_TOKEN_SECRET
     );
-    console.log("accessToken1");
     if (accessToken === undefined && refreshToken === undefined) {
       return errorResponse(res, 400, "please login");
     } else if (accessToken === undefined && result.expired === false) {
@@ -39,7 +38,6 @@ export const guard = async (
       if (payload) {
         // @ts-ignore
         req.User = payload.payload;
-        console.log("accessToken5");
         return next();
       }
     }
