@@ -2,15 +2,22 @@ import { Model, DataTypes } from 'sequelize'
 import { Iaccount } from '../utils/interface'
 import db from './index';
 
+
 class Account extends Model<Iaccount> {
   declare id: number;
   declare userId: number;
   declare balance: number;
   declare createdAt: Date;
   declare updatedAt: Date;
+  
 
   static associate(models:any) {
     Account.belongsTo(models.Users);
+
+    Account.hasOne(models.Transaction,{
+      sourceKey: 'id',
+      foreignKey: 'accountId',  
+    }) 
   }
 
 }
