@@ -20,7 +20,7 @@ export const guard = async (
       refreshToken,
       config.REFRESH_TOKEN_SECRET
     );
-    if (accessToken === undefined && refreshToken === undefined) {
+    if (!refreshToken ) {
       return errorResponse(res, 400, "please login");
     } else if (accessToken === undefined && result.expired === false) {
       newAccessToken = await reIssueAccessToken(refreshToken);
