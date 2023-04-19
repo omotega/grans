@@ -28,9 +28,10 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
-app.use("/api", route.userRouter);
-app.use("/api", route.adminRouter);
-app.use('/api', route.cardTransactionRouter);
+app.use("/api/user", route.userRouter);
+app.use("/api/admin", route.adminRouter);
+app.use('/api/cardtransaction', route.cardTransactionRouter);
+app.use('/api/transaction',route.transactionRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).send({
