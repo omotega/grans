@@ -21,6 +21,7 @@ export interface Isession {
 
 export interface CustomRequest {
   User: Iuser;
+  reference:string;
   file: object;
   params: object;
   query: object;
