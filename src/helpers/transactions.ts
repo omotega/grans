@@ -1,13 +1,14 @@
 import { v4 } from "uuid";
 import Account from "../models/account";
 import Transaction from "../models/transaction";
-import db from "../models";
+import db from '../models/index';
 
 export async function creditAccount(
   creditData: {
     amount?: number;
     accountId?: number;
     purpose?: string;
+    reference?:string
     metadata?: any;
   },
   t: any
@@ -45,9 +46,9 @@ export async function debitAccount(
   debitData: {
     accountId: number;
     amount: number;
-    purpose: string;
-    reference: string;
-    metadata: any;
+    purpose?: string;
+    reference?: string;
+    metadata?: any;
   },
   t: any
 ) {
