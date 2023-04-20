@@ -5,7 +5,8 @@
 This is a wallet api where users can perform basic banking operations like transferring funds,depositing funds and more.
 
 ### Features
-1. USERS
+
+1.USERS
 
 a. User Signup 
 * Route api/user/signup
@@ -23,7 +24,7 @@ d. User Profile Update
 * Route api/user/updateprofile
 * Method PATCH
 
-2. CARD TRANSACTIONS (Funding your wallet with card)
+2.CARD TRANSACTIONS (Funding your wallet with card)
 
 a. Card Transactions Without Validation
 * Route api/cardtransaction/fundwallet
