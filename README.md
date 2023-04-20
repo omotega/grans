@@ -4,6 +4,33 @@
 ## About Grans
 This is a wallet api where users can perform basic banking operations like transferring funds,depositing funds and more.
 
+### Features
+1. USERS
+a. User Signup 
+   * Route api/user/signup
+   * Method POST
+b. User Login
+   * Route api/user/login
+   * Method GET
+c. User Verification
+   * Route api/user/login
+   * Method GET
+d. User Profile Update
+   * Route api/user/updateprofile
+   * Method PATCH
+
+2. CARD TRANSACTIONS (Funding your wallet with card)
+a. Card Transactions Without Validation
+   * Route api/cardtransaction/fundwallet
+   * Method POST
+b. Card transaction with Pin
+   * Route api/cardtransaction/submitpin
+   * Method POST
+c. Card transaction with Pin and otp
+   * Route api/cardtransaction/submitotp
+   * Method POST
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Contributing
 
@@ -19,6 +46,7 @@ Don't forget to give the project a star! Thanks again!
 5. Open a Pull Request
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ### Technologies Used
 
 * Node.js - Javascript runtime environment
