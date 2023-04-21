@@ -57,7 +57,6 @@ export async function chargeCard(req: Request, res: Response) {
         lastResponse: cardCharge.data.data.status,
       });
       const reference = cardCharge.data.data.reference;
-      req.reference = reference;
       await t.commit();
       return successResponse(res, 200, "charge successful", reference);
     } else {
@@ -101,13 +100,9 @@ export const submitPin = async (req: Request, res: Response) => {
     const { pin } = req.body;
     const reference = req.reference;
     const url = `${PAYSTACK_URL}/submit_pin`;
-    console.log(url, "URL OOO");
-    console.log(pin, reference);
     const transaction = await CardTransaction.findOne({
       where: { externalReference: reference },
     });
-
-    console.log(transaction?.dataValues, "THIS IS TRANSACTION");
     if (!transaction) {
       return { message: "transaction not found" };
     }
@@ -126,8 +121,6 @@ export const submitPin = async (req: Request, res: Response) => {
         },
       }
     );
-    console.log(charge.data, "THIS IS CHARGE INFORMATION");
-
     if (charge.data.data.status === "success") {
       console.log("YOU SURE SAY THE REQUEST REACH HERE");
       const credit = await creditAccount(
@@ -198,7 +191,6 @@ export const submitOtp = async (req:Request,res:Response) => {
       }
     );
     if (charge.data.data.status === "success") {
-      console.log("YOU SURE SAY THE REQUEST REACH HERE");
       await CardTransaction.update(
         { lastResponse: charge.data.data.status },
         { where: { externalReference: reference} }
