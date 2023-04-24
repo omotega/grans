@@ -122,7 +122,6 @@ export const submitPin = async (req: Request, res: Response) => {
       }
     );
     if (charge.data.data.status === "success") {
-      console.log("YOU SURE SAY THE REQUEST REACH HERE");
       const credit = await creditAccount(
         {
           amount: charge.data.data.amount,
