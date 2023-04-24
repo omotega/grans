@@ -82,7 +82,6 @@ export const transfer = async (req:Request,res:Response) => {
         Authorization: `Bearer ${config.PAYSTACK_SECRET_KEY}`,
       },
     })
-    console.log(initiateTransfer.data,'THIS IS THE INITIATED TRANSFER')
      if(initiateTransfer.data.data.status === 'success') {
         const transactionResult = await Promise.all([debitAccount({
       // @ts-ignore
