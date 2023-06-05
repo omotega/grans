@@ -4,6 +4,7 @@ dotenv.config();
 import axios from "axios";
 import config from "../config/config";
 import CardTransaction from "../models/card_transaction";
+import User from '../models/user'
 import db from "../models";
 import { creditAccount } from "../helpers/transactions";
 import { errorResponse, handleError, successResponse } from "../utils/response";
@@ -11,12 +12,13 @@ import Helper from "../utils/helper";
 
 const PAYSTACK_URL = "https://api.paystack.co/charge";
 
+// funding wallet with card transcations
 export async function chargeCard(req: Request, res: Response) {
   let credit;
-  const { accountId, pan, expiry_month, expiry_year, cvv, email, amount } =
-    req.body;
-
   const t = await db.transaction();
+  const {  pan, expiry_month, expiry_year, cvv, email, amount } =
+    req.body;
+    const { id } = req.User
   try {
     const cardCharge = await axios.post(
       PAYSTACK_URL,
@@ -37,10 +39,14 @@ export async function chargeCard(req: Request, res: Response) {
       }
     );
     if (cardCharge.data.data.status === "success") {
+      const user = await User.findOne({where:{id},transaction:t})
+      if(!user) return errorResponse(res,404,'could not find any user with this id')
+     
+       
       credit = await creditAccount(
         {
           amount: amount,
-          accountId: accountId,
+          accountId: user.dataValues.id,
           purpose: "card-funding",
         },
         t
@@ -52,7 +58,7 @@ export async function chargeCard(req: Request, res: Response) {
       }
       const card_transaction = await CardTransaction.create({
         externalReference: cardCharge.data.data.reference,
-        accountId: accountId,
+        accountId: user.dataValues.id,
         amount: amount,
         lastResponse: cardCharge.data.data.status,
       });
@@ -60,9 +66,11 @@ export async function chargeCard(req: Request, res: Response) {
       await t.commit();
       return successResponse(res, 200, "charge successful", reference);
     } else {
+      const user = await User.findOne({where:{id},transaction:t})
+      if(!user) return errorResponse(res,404,'could not find any user with this id')
       const card_transaction = await CardTransaction.create({
         externalReference: cardCharge.data.data.reference,
-        accountId: accountId,
+        accountId: user?.dataValues.id,
         amount: amount,
         lastResponse: cardCharge.data.data.status,
       });
