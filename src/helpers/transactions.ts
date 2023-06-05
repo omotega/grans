@@ -64,6 +64,7 @@ export async function debitAccount(
 
   const debit = await Transaction.create(
     {
+      amount: debitData.amount,
       txnType: "debit",
       purpose: debitData.purpose,
       accountId: debitData.accountId,
