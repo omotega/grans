@@ -6,6 +6,7 @@ import { errorResponse, handleError, successResponse } from "../utils/response";
 import config from "../config/config";
 import { Request, Response } from "express";
 import Helper from "../utils/helper";
+import Transaction from "../models/transaction";
 
 export const deposit = async (req:Request,res:Response) => {
   const t = await db.transaction();
@@ -33,11 +34,11 @@ export const deposit = async (req:Request,res:Response) => {
 };
 
 export const transfer = async (req:Request,res:Response) => {
-  const t = db.transaction();
+  const t = await db.transaction();
   let bank_code;
   try {
     const { id } = req.User;
-    const { accountNumber,bankName } = req.body
+    const { accountNumber,bankName,amount } = req.body
     const bank = await axios.get(" https://api.paystack.co/bank", {
       headers: {
         Authorization: `Bearer ${config.PAYSTACK_SECRET_KEY}`,
@@ -73,7 +74,7 @@ export const transfer = async (req:Request,res:Response) => {
     const reference = v4();
     const initiateTransfer = await axios.post('https://api.paystack.co/transfer', {
       source: "balance", 
-      amount: "37800",
+      amount: amount,
       reference: reference, 
       recipient: recipientReference, 
       reason: "Holiday Flexing" 
@@ -82,23 +83,24 @@ export const transfer = async (req:Request,res:Response) => {
         Authorization: `Bearer ${config.PAYSTACK_SECRET_KEY}`,
       },
     })
-     if(initiateTransfer.data.data.status === 'success') {
-        const transactionResult = await Promise.all([debitAccount({
-      // @ts-ignore
-      accountId: id,
-      amount: initiateTransfer.data.data.amount,
+    console.log(initiateTransfer.data,'Transfer RESULT')
+     if(initiateTransfer.data.status === true) {
+      const transactionResult = await Promise.all([
+      debitAccount({
+      amount: 50000,
+      accountId: 2,
       purpose:'transfer',
       reference:reference,
       metadata:{
         receiver:recipientReference,
         accountName: 'isAccountValid.data.data.account_name',
-           bankCode: bank_code ,
+          bankCode: bank_code ,
           currency: initiateTransfer.data.data.currency,
       }
     },t),
     creditAccount({
-      amount:initiateTransfer.data.data.amount,
-      accountId:accountNumber,
+      amount:amount,
+      accountId:id,
       purpose:"transfer",
       reference: reference,
       metadata:{
@@ -112,19 +114,34 @@ export const transfer = async (req:Request,res:Response) => {
     !result.success;
   })
   if(failedTransactions.length) {
-    (await t).rollback()
+    await t.rollback()
     return transactionResult;
   }
-  (await t).commit()
+  await t.commit()
    return successResponse(res,200,'transfer successful')
      } else {
       return errorResponse(res,401,'Transfer unsuccessful,Try again');
      }
   } catch (error) {
-    await (await t).rollback();
+    await await t.rollback();
     handleError(req, error);
     return errorResponse(res, 500, "Something went wrong");
   }
 };
 
-const withdrawl = async () => {};
+// async function reverse(reference:string)  {
+//   const t = await db.transaction();
+//   try {
+//     const transaction = await Transaction.findAll({where:{reference}});
+//     console.log(transaction);
+//     // const reversal = await Promise.all([
+//     //   await creditAccount({
+//     //     amount: 
+//     //   })
+//     // ])
+//   } catch (error) {
+    
+//   }
+// };
+
+// reverse()
