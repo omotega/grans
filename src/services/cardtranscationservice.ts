@@ -23,7 +23,6 @@ async function whenPaystackResposeIsSubmitPin(payload: {
     amount: amount,
     lastResponse: status,
   });
-  console.log(card_transaction, "THIS IS THE SEND PIN RESPONSE");
   if (!card_transaction) throw new Error(CARD_TRANSACTION_ERROR);
 }
 
