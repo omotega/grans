@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Transaction {
+  id            String          @id @default(uuid())
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  txnType       TransactionType
+  purpose       Purpose
+  amount        Float
+  reference     String          @default(uuid())
+  balanceBefore Float
+  balanceAfter  Float
+  metadata      Json?
+  account       Account         @relation(fields: [accountId], references: [id])
+  accountId     String
+}
+
+model Account {
+  id              String           @id @default(uuid())
+  balance         Int
+  accountNumber   Int              @unique
+  user            User             @relation(fields: [userId], references: [id])
+  userId          String           @unique
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  Transaction     Transaction[]
+  CardTransaction CardTransaction[]
+}
+
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  name           String
+  password       String
+  profilePicture String?
+  phoneNumber    String   @unique
+  verified       Boolean  @default(false)
+  role           Role     @default(USER)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Account        Account?
+  Session        Session?
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  valid     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CardTransaction {
+  id                String   @id @default(uuid())
+  externalReference String   @unique
+  account           Account?  @relation(fields: [accountId], references: [id])
+  accountId         String?   
+  amount            Float
+  lastResponse       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+}
+
+enum Purpose {
+  CARDFUNDING
+  DEPOSIT
+  TRANSFER
+  WITHDRAWL
+  REVERSAL
+}
