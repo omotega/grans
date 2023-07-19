@@ -12,6 +12,7 @@
     "emitDecoratorMetadata": true,
     
   },
+  "type": "module",
   "ts-node":{
     "esm":true,
   },
