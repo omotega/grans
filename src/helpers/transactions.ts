@@ -1,82 +1,65 @@
 import { v4 } from "uuid";
-import Account from "../models/account";
-import Transaction from "../models/transaction";
-import db from '../models/index';
+import accountrepo from "../database/repo/accountrepo";
+import transactionrepo from "../database/repo/transactionrepo";
+import { ACCOUNT_NOT_FOUND } from "../utils/constant";
 
-export async function creditAccount(
-  creditData: {
-    amount?: number;
-    accountId?: number;
-    purpose?: string;
-    reference?:string
-    metadata?: any;
-  },
-  t: any
-) {
+async function creditAccount(creditData: {
+  amount: number;
+  accountId: string;
+  purpose?: string;
+  reference?: string;
+  metadata?: any;
+}) {
   const reference = v4();
-  const account = await Account.findOne({
-    where: { id: creditData.accountId },
-    transaction: t,
-  });
-  if (!account) return "account not found";
-  await account.increment(["balance"], { by: creditData.amount });
-  await Transaction.create(
-    {
-      txnType: "credit",
-      purpose: "card-funding",
-      amount: creditData.amount,
-      accountId: creditData.accountId,
-      metadata: creditData.metadata,
-      reference: reference,
-      balanceBefore: Number(account.balance),
-      balanceAfter: Number(account.balance) + Number(creditData.amount),
-    },
-    { transaction: t, Lock: t.LOCK.UPDATE }
+  const account = await accountrepo.findAccountById(creditData.accountId);
+  if (!account) throw new Error(ACCOUNT_NOT_FOUND);
+  const increaseBalance = await accountrepo.accountBalanceIncrement(
+    creditData.amount,
+    creditData.accountId
   );
-  return { success: true, message: "credit successful" };
+  const transaction = await transactionrepo.createTransaction({
+    txnType: "CREDIT",
+    purpose: creditData.purpose,
+    amount: creditData.amount,
+    accountId: creditData.accountId,
+    metadata: creditData.metadata,
+    reference: reference,
+    balanceBefore: Number(account.balance),
+    balanceAfter: Number(account.balance) + Number(creditData.amount),
+  });
+  return { status: true, message: "Credit succesful" };
 }
 
-// Account.increment({balance: -8000},{where:{id:1}}).then(console.log).catch(console.log)
-
-// creditAccount({ amount: 1000, accountId: 1, purpose: "card-funding" })
-//    .then(console.log)
-//    .catch(console.log);
-
-export async function debitAccount(
-  debitData: {
-    accountId: number;
-    amount: number;
-    purpose?: string;
-    reference?: string;
-    metadata?: any;
-  },
-  t: any
-) {
-  const account = await Account.findOne({
-    where: { id: debitData.accountId },
-    transaction: t,
-  });
-  if (!account) return "account not found";
+async function debitAccount(debitData: {
+  accountId: string;
+  amount: number;
+  purpose?: string;
+  reference?: string;
+  metadata?: any;
+}) {
+  const account = await accountrepo.findAccountById(debitData.accountId);
+  if (!account) throw new Error(ACCOUNT_NOT_FOUND);
   if (Number(account.balance) < debitData.amount) {
     return { error: "insufficient balance" };
   }
-  account.increment(["balance"], { by: -debitData.amount });
-
-  const debit = await Transaction.create(
-    {
-      amount: debitData.amount,
-      txnType: "debit",
-      purpose: debitData.purpose,
-      accountId: debitData.accountId,
-      reference: v4(),
-      metadata: debitData.metadata,
-      balanceBefore: Number(account.balance),
-      balanceAfter: Number(account.balance) - Number(debitData.amount),
-    },
-    {
-      transaction: t,
-      lock: t.LOCK.UPDATE,
-    }
+  const decreasedBalanced = await accountrepo.accountBalanceDecrement(
+    debitData.amount,
+    debitData.accountId
   );
+  const debit = await transactionrepo.createTransaction({
+    amount: debitData.amount,
+    txnType: "DEBIT",
+    purpose: debitData.purpose,
+    accountId: debitData.accountId,
+    reference: v4(),
+    metadata: debitData.metadata,
+    balanceBefore: Number(account.balance),
+    balanceAfter: Number(account.balance) - Number(debitData.amount),
+  });
   return { success: true, message: "debit successful" };
+}
+
+export default {
+  creditAccount,
+  debitAccount
 }
