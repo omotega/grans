@@ -1,11 +1,15 @@
-import { Router } from 'express'
+import { Router } from "express";
 
 const transactionRouter = Router();
-import { deposit,transfer,withdrawl } from '../controllers/transactions'
-import { guard } from '../middleware/auth';
+import transactionController from "../controllers/transactions";
+import { guard } from "../middleware/auth";
 
-transactionRouter.route('/deposit').post(deposit)
-transactionRouter.route('/transfer').post(guard,transfer)
-transactionRouter.route('/withdrawl').post(guard,withdrawl)
+transactionRouter.route("/deposit").post(transactionController.deposit);
+transactionRouter
+  .route("/transfer")
+  .post(guard, transactionController.transfer);
+transactionRouter
+  .route("/withdrawl")
+  .post(guard, transactionController.withdrawl);
 
-export default transactionRouter
+export default transactionRouter;
