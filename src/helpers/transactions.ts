@@ -1,7 +1,16 @@
 import { v4 } from "uuid";
 import accountrepo from "../database/repo/accountrepo";
 import transactionrepo from "../database/repo/transactionrepo";
-import { ACCOUNT_NOT_FOUND } from "../utils/constant";
+import {
+  ACCOUNT_NOT_FOUND,
+  CREDIT_SUCCESSFUL,
+  CREDIT_TRANSACTION_ERROR,
+  DEBIT_SUCCESSFUL,
+  DEBIT_TRANSACTION_ERROR,
+  DECREASE_BALANCE_ERROR,
+  INCREASE_BALANCE_ERROR,
+  INSUFFICIENT_BALANCE,
+} from "../utils/constant";
 
 async function creditAccount(creditData: {
   amount: number;
@@ -17,7 +26,8 @@ async function creditAccount(creditData: {
     creditData.amount,
     creditData.accountId
   );
-  const transaction = await transactionrepo.createTransaction({
+  if (!increaseBalance) throw new Error(INCREASE_BALANCE_ERROR);
+  const credit = await transactionrepo.createTransaction({
     txnType: "CREDIT",
     purpose: creditData.purpose,
     amount: creditData.amount,
@@ -27,7 +37,8 @@ async function creditAccount(creditData: {
     balanceBefore: Number(account.balance),
     balanceAfter: Number(account.balance) + Number(creditData.amount),
   });
-  return { status: true, message: "Credit succesful" };
+  if (!credit) throw new Error(CREDIT_TRANSACTION_ERROR);
+  return { status: true, message: CREDIT_SUCCESSFUL };
 }
 
 async function debitAccount(debitData: {
@@ -39,13 +50,13 @@ async function debitAccount(debitData: {
 }) {
   const account = await accountrepo.findAccountById(debitData.accountId);
   if (!account) throw new Error(ACCOUNT_NOT_FOUND);
-  if (Number(account.balance) < debitData.amount) {
-    return { error: "insufficient balance" };
-  }
+  if (Number(account.balance) < debitData.amount)
+    throw new Error(INSUFFICIENT_BALANCE);
   const decreasedBalanced = await accountrepo.accountBalanceDecrement(
     debitData.amount,
     debitData.accountId
   );
+  if (!decreasedBalanced) throw new Error(DECREASE_BALANCE_ERROR);
   const debit = await transactionrepo.createTransaction({
     amount: debitData.amount,
     txnType: "DEBIT",
@@ -56,10 +67,11 @@ async function debitAccount(debitData: {
     balanceBefore: Number(account.balance),
     balanceAfter: Number(account.balance) - Number(debitData.amount),
   });
-  return { success: true, message: "debit successful" };
+  if (!debit) throw new Error(DEBIT_TRANSACTION_ERROR);
+  return { success: true, message: DEBIT_SUCCESSFUL };
 }
 
 export default {
   creditAccount,
-  debitAccount
-}
+  debitAccount,
+};
