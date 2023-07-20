@@ -4,6 +4,8 @@ import {
   DEPOSIT_SUCCESSFUL,
   TRANSFER_SUCCESSFUL,
   TRANSFER_UNSUCCESSFUL,
+  WITHDRAWL_SUCCESSFUL,
+  WITHDRAWL_SUCCESS_ERROR,
 } from "../utils/constant";
 import Helper from "../utils/helper";
 import paystackService from "./paystack";
@@ -92,8 +94,20 @@ async function transfer(payload: {
   return { status: true, message: TRANSFER_SUCCESSFUL };
 }
 
+async function withdrawl(payload: { accountId: string; amount: number }) {
+  const { accountId, amount } = payload;
+  const debit = await transactionhelpers.debitAccount({
+    amount: amount,
+    accountId: accountId,
+    purpose: "WITHDRAWL",
+  });
+  if (!debit.success) throw new Error(WITHDRAWL_SUCCESS_ERROR);
+  return { status: true, message: WITHDRAWL_SUCCESSFUL };
+}
+
 
 export default {
   deposit,
   transfer,
+  withdrawl
 };
