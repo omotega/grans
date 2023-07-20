@@ -22,27 +22,10 @@ export const transfer = async (req: Request, res: Response) => {
 };
 
 export async function withdrawl(req: Request, res: Response) {
-  const t = await db.transaction();
-  const { accountid, amount } = req.body;
-  try {
-    const debit = await debitAccount(
-      {
-        amount: amount,
-        accountId: accountid,
-        purpose: "withdrawl",
-      },
-      t
-    );
-    // @ts-ignore
-    if (!debit.success) {
-      await t.rollback();
-      return errorResponse(res, 400, "withdrawl could not be completed");
-    }
-    await t.commit();
-    return successResponse(res, 200, "withdrawl successful");
-  } catch (error) {
-    await await t.rollback();
-    handleError(req, error);
-    return errorResponse(res, 500, "Something went wrong");
-  }
+  const { accountId, amount } = req.body;
+  const response = await transactionservices.withdrawl({
+    accountId,
+    amount,
+  });
+  res.status(httpStatus.OK).json(response);
 }
