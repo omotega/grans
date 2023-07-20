@@ -2,6 +2,7 @@ import argon from "argon2";
 import jwt from "jsonwebtoken";
 import Otp from "otp-generator";
 import config from "../config/config";
+import { v4 } from "uuid";
 
 const ACCESS_SECRET = config.ACCESS_TOKEN_SECRET;
 const REFRESH_SECRET = config.REFRESH_TOKEN_SECRET;
@@ -42,6 +43,13 @@ class Helper {
 
     return token;
   }
+  static generateRefreshToken = async (payload: any) => {
+    await Helper.generateToken(payload, config.REFRESH_TOKEN_SECRET);
+  };
+
+  static generateAccesToken = async (payload: any) => {
+    await Helper.generateToken(payload, config.ACCESS_TOKEN_SECRET);
+  };
 
   /**
    * this gets the payload from the token
@@ -80,6 +88,30 @@ class Helper {
     );
 
     return result;
+  };
+
+  static generateRandomUnique6DigitNumber = async (): Promise<any> => {
+    let generatedNumbers: any = [];
+    var randomNumber = Math.floor(Math.random() * 900000 + 100000);
+
+    var isUnique = true;
+    for (var i = 0; i < generatedNumbers.length; i++) {
+      if (randomNumber === generatedNumbers[i]) {
+        isUnique = false;
+        break;
+      }
+    }
+
+    if (isUnique) {
+      return randomNumber;
+    } else {
+      return Helper.generateRandomUnique6DigitNumber();
+    }
+  };
+
+  static generateReference = async () => {
+    const reference = v4();
+    return reference;
   };
 }
 
