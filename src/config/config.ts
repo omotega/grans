@@ -8,6 +8,9 @@ const config = {
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET as string,
     ACCESS_TOKEN_SECRET_EXPIRY_TIME: process.env.ACCESS_TOKEN_SECRET_EXPIRY_TIME ,
     REFRESH_TOKEN_SECRET_EXPIRY_TIME: process.env.REFRESH_TOKEN_SECRET_EXPIRY_TIME,
+    sendgridKey: process.env.SENDGRID_API_KEY as string,
+    sendgridEmail: process.env.SENDGRID_EMAIL as string
+
 };
 
 export default config;

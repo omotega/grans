@@ -4,7 +4,7 @@ import Helper from "../utils/helper";
 import { errorResponse, handleError } from "../utils/response";
 import config from "../config/config";
 import Session from "../models/session";
-import { reIssueAccessToken } from "../services/session";
+import { reIssueAccessToken } from "../services/sessionservices";
 
 export const guard = async (
   req: Request,

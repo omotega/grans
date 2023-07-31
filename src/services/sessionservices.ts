@@ -10,7 +10,6 @@ export async function reIssueAccessToken(refreshToken: any) {
     refreshToken,
     config.REFRESH_TOKEN_SECRET
   );
-  console.log(payload)
   if (!payload) {
     return false;
   }
@@ -35,7 +34,6 @@ export async function deleteSession(refreshToken: any) {
     refreshToken,
     config.REFRESH_TOKEN_SECRET
   );
-  console.log(payload)
   if (!payload) {
     return false;
   }

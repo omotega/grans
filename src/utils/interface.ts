@@ -1,5 +1,5 @@
 export interface Iuser {
-  id?: number;
+  id?: string;
   name: string;
   password: string;
   email: string;
@@ -7,6 +7,7 @@ export interface Iuser {
   verified?: boolean;
   photo?: string;
   role?: string;
+  phone: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -21,7 +22,7 @@ export interface Isession {
 
 export interface CustomRequest {
   User: Iuser;
-  reference:string;
+  reference: string;
   file: object;
   params: object;
   query: object;
@@ -71,11 +72,11 @@ export interface IcardTransaction {
 }
 
 export interface Icard {
-  accountid?:number,
-  pan?: string,
-  expiry_year?: string,
-  expiry_month?:string,
-  cvv?:string,
-  email?: string,
-  amount?:number,
+  accountid?: number;
+  pan?: string;
+  expiry_year?: string;
+  expiry_month?: string;
+  cvv?: string;
+  email?: string;
+  amount?: number;
 }
