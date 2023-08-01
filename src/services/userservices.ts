@@ -35,12 +35,6 @@ async function register(payload: {
 
   return user;
 }
-register({
-  name:'tega',
-  email:"tada@gmail.com",
-  password:"tadanam",
-  phoneNumber:'08136859270'
-}).then(console.log).catch(console.log)
 
 async function login(payload: { email: string; password: string }) {
   const { email, password } = payload;
