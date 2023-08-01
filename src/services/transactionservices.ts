@@ -105,13 +105,7 @@ async function withdrawl(payload: { accountId: string; amount: number }) {
   return { status: true, message: WITHDRAWL_SUCCESSFUL };
 }
 
-transfer({
-  accountNumber: "0704864120",
-  bankName: "Access Bank",
-  amount: 10000,
-})
-  .then(console.log)
-  .catch(console.log);
+
 
 export default {
   deposit,

@@ -127,16 +127,7 @@ const initiateTransfer = async (payload: any) => {
   const data = await response.json();
   return data;
 };
-// chargeCard({
-//   number: "507850785078507812",
-//   cvv: "081",
-//   expiry_month: "07",
-//   expiry_year: "24",
-//   amount: 10000,
-//   email: "tomoyibo@gmail.com",
-// })
-//   .then(console.log)
-//   .catch(console.log);
+
 
 export default {
   chargeCard,

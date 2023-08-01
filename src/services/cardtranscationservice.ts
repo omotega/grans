@@ -189,33 +189,6 @@ async function submitPhone(payload: {
   }
 }
 
-// fundWalletWithCard({
-//   number: "5060666666666666666",
-//   cvv: "123",
-//   expiry_month: "07",
-//   expiry_year: "24",
-//   amount: 10000,
-//   email: "tomoyibo@gmail.com",
-//   accountId: "e17441bf-f48a-4e44-8bcb-db1df67e39db",
-// })
-//   .then(console.log)
-//   .catch(console.log);
-
-// submitPin({
-//   pin: "1234",
-//   reference: "wmsac382ze16aik",
-//   accountId: "e17441bf-f48a-4e44-8bcb-db1df67e39db",
-// })
-//   .then(console.log)$
-//   .catch(console.log);
-
-submitPhone({
-  otp: "123456",
-  reference: "wmsac382ze16aik",
-  accountId: "e17441bf-f48a-4e44-8bcb-db1df67e39db",
-})
-  .then(console.log)
-  .catch(console.log);
 
 export default {
   fundWalletWithCard,
