@@ -6,6 +6,7 @@ import {
   USER_NOT_FOUND,
 } from "../utils/constant";
 import Helper from "../utils/helper";
+import config from "../config/config";
 
 async function register(payload: {
   name: string;
@@ -36,15 +37,23 @@ async function register(payload: {
   return user;
 }
 
+
 async function login(payload: { email: string; password: string }) {
   const { email, password } = payload;
   const isUser = await userrepo.findUserByEmail(email);
   if (!isUser) throw new Error(USER_NOT_FOUND);
   const isPassword = await Helper.comparePassword(isUser.password, password);
   if (!isPassword) throw new Error(INCORRECT_PASSWORD);
-  
+  console.log(config.ACCESS_TOKEN_SECRET);
+  const token = await Helper.generateToken({
+    _id: isUser.id,
+    role: isUser.role,
+  });
+  const response = { isUser, token };
+  return response;
 }
 
 export default {
   register,
+  login,
 };

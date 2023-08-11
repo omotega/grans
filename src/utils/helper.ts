@@ -36,7 +36,7 @@ class Helper {
    * @params  the user payload
    */
 
-  static generateToken(payload: any, secret: string) {
+  static generateToken(payload: any, secret = config.ACCESS_TOKEN_SECRET) {
     const token = jwt.sign(payload, secret, {
       expiresIn: "1h",
     });
