@@ -8,6 +8,10 @@ async function findAccountById(id: string) {
   return db.account.findUnique({ where: { id: id } });
 }
 
+async function findAccountByUserId(id: string) {
+  return db.account.findUnique({ where: { userId: id } });
+}
+
 async function accountBalanceIncrement(amount: number, id: string) {
   return db.account.update({
     where: { id: id },
@@ -35,4 +39,5 @@ export default {
   findAccountById,
   accountBalanceIncrement,
   accountBalanceDecrement,
+  findAccountByUserId,
 };
