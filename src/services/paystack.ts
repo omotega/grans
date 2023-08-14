@@ -107,6 +107,29 @@ const initiateTransfer = async (payload: any) => {
   return response;
 };
 
+const getBankForBankTransfer = async () => {
+  const url = `${PAYSTACK_BASE_URL}/bank?pay_with_bank=true`;
+  const response = await sendRequest({ url: url, method: "get" });
+  return response;
+};
+
+const bankTransfer = async (payload: any) => {
+  const url = `${PAYSTACK_BASE_URL}/charge`;
+  const input = {
+    email: payload.email,
+    amount: payload.amount,
+    bank: {
+      code: payload.code,
+      account_number: payload.account_number,
+      phone: payload.phone,
+      token: payload.token,
+    },
+  };
+
+  const response = await sendRequest({ url: url, method: "post", body: input });
+  return response;
+};
+
 
 export default {
   chargeCard,
@@ -116,4 +139,6 @@ export default {
   accountValidityCheck,
   createTransferRecipient,
   initiateTransfer,
+  getBankForBankTransfer,
+  bankTransfer,
 };
