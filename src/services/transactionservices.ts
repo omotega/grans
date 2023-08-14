@@ -25,9 +25,10 @@ async function transfer(payload: {
   accountNumber: string;
   bankName: string;
   amount: number;
+  id: string;
 }) {
   let bank_code;
-  const { accountNumber, bankName, amount } = payload;
+  const { accountNumber, bankName, amount, id } = payload;
   const bank = await paystackService.getBank();
   const bankData = bank.data;
 
@@ -58,6 +59,8 @@ async function transfer(payload: {
     reason: "Holiday Flexing",
   });
 
+  const userAccountId = await transactionhelpers.getUserAccountId(id);
+
   if (initiateTransfer.data.status != "success")
     throw new Error(TRANSFER_UNSUCCESSFUL);
   const transferResult = await Promise.all([
@@ -75,7 +78,7 @@ async function transfer(payload: {
     }),
     await transactionhelpers.debitAccount({
       amount: amount,
-      accountId: accountNumber,
+      accountId: userAccountId,
       purpose: "transfer",
       reference: reference,
       metadata: {
@@ -105,10 +108,16 @@ async function withdrawl(payload: { accountId: string; amount: number }) {
   return { status: true, message: WITHDRAWL_SUCCESSFUL };
 }
 
-
+// transfer({
+//   accountNumber: "0704864120",
+//   bankName: "Access Bank",
+//   amount: 10000,
+// })
+//   .then(console.log)
+//   .catch(console.log);
 
 export default {
   deposit,
   transfer,
-  withdrawl
+  withdrawl,
 };

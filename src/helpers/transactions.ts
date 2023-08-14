@@ -71,7 +71,15 @@ async function debitAccount(debitData: {
   return { success: true, message: DEBIT_SUCCESSFUL };
 }
 
+async function getUserAccountId(userId: string) {
+  const userAccount = await accountrepo.findAccountByUserId(userId);
+  if (!userAccount) throw new Error("USER_NOT_FOUND");
+  const userAccountId = userAccount.id;
+  return userAccountId;
+}
+
 export default {
   creditAccount,
   debitAccount,
+  getUserAccountId,
 };
