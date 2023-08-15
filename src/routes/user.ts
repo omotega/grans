@@ -12,18 +12,18 @@ userRouter
   .route("/signup")
   .post(
     userValidationMiddleware.validateRegisterMiddleware,
-    usercontrollerfunction.Register
+    userController.Register
   );
 
 userRouter
   .route("/login")
   .post(
     userValidationMiddleware.validateLoginMiddleware,
-    usercontrollerfunction.login
+    userController.login
   );
 
 userRouter
   .route("/profile")
-  .patch(authMiddleware.guard, usercontrollerfunction.updateProfile);
+  .patch(authMiddleware.guard, userController.updateProfile);
 
 export default userRouter;
