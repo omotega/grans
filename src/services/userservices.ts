@@ -33,10 +33,8 @@ async function register(payload: {
     balance: 10000,
     accountNumber: accountNumber,
   });
-
   return user;
 }
-
 
 async function login(payload: { email: string; password: string }) {
   const { email, password } = payload;
@@ -53,7 +51,26 @@ async function login(payload: { email: string; password: string }) {
   return response;
 }
 
+async function updateProfile(payload: {
+  userId: string;
+  email?: string;
+  password?: string;
+}) {
+  const { userId, email, password } = payload;
+  const user = await userrepo.findUserById(userId);
+  if (!user) throw new Error(USER_NOT_FOUND);
+  const updatedUser = await userrepo.updateField({
+    userId: userId,
+    email: email,
+    password: password,
+  });
+  return updatedUser;
+}
+
 export default {
   register,
   login,
+  updateProfile,
 };
+
+
