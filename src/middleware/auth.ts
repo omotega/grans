@@ -16,7 +16,7 @@ export const guard = async (
       token,
       config.ACCESS_TOKEN_SECRET
     );
-    const user = await userrepo.findUserById(decode.id);
+    const user = await userrepo.findUserById(decode.payload._id);
     if (!user) throw new Error(USER_NOT_FOUND);
     req.User = user;
     return next();
@@ -40,4 +40,5 @@ export const verifyAdmin = async (
 
 export default {
   guard,
+  verifyAdmin,
 };
