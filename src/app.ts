@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
 import httpLogger from "./logger/httplogger";
-import { CustomRequest } from "./utils/interface";
+import { CustomRequest } from "./types/customrequest";
 import route from "./routes/index";
 
 dotenv.config();
@@ -26,10 +26,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("welcome to this wallet application");
 });
 
-app.use("/api/user", route.userRouter);
-app.use("/api/admin", route.adminRouter);
-app.use("/api/cardtransaction", route.cardTransactionRouter);
-app.use("/api/transaction", route.transactionRouter);
+app.use("/api", route);
 
 app.use((req: Request, res: Response) => {
   res.status(404).send({
