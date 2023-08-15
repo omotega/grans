@@ -1,3 +1,4 @@
+import { Iuser } from "../../types/user";
 import db from "../dbconnection";
 
 async function findUserByEmail(email: string) {
@@ -17,9 +18,23 @@ async function findUserByRole(payload: { userId: string; role: any }) {
   return db.user.findUnique({ where: { id: userId, role: role } });
 }
 
+async function updateField(payload: {
+  userId: string;
+  password?: string;
+  email?: string;
+}) {
+  const { userId, password, email } = payload;
+  return db.user.update({
+    where: { id: userId },
+    data: { password: password, email: email },
+  });
+}
+
+
 export default {
   findUserByEmail,
   createUser,
   findUserById,
   findUserByRole,
+  updateField,
 };
