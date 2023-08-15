@@ -1,17 +1,29 @@
-import { Router } from 'express'
+import { Router } from "express";
+import { wrapController } from "../utils/catchasync";
 
 const userRouter = Router();
 
-import { Register,verify,login,updateProfile,logOut } from '../controllers/usercontroller'
-import { loginMiddleware, validateRegisterMiddleware } from '../middleware/validate';
-import { guard } from '../middleware/auth'
+import usercontrollerfunction from "../controllers/usercontroller";
+const userController = wrapController(usercontrollerfunction);
+import userValidationMiddleware from "../middleware/validate";
+import authMiddleware from "../middleware/auth";
 
-userRouter.route('/signup').post(validateRegisterMiddleware,Register);
-userRouter.route('/verify').post(verify);
-userRouter.route('/login').get(loginMiddleware,login);
+userRouter
+  .route("/signup")
+  .post(
+    userValidationMiddleware.validateRegisterMiddleware,
+    usercontrollerfunction.Register
+  );
 
-userRouter.route('/profile').patch(guard,updateProfile);
-userRouter.route('/logout').delete(logOut);
+userRouter
+  .route("/login")
+  .post(
+    userValidationMiddleware.validateLoginMiddleware,
+    usercontrollerfunction.login
+  );
 
+userRouter
+  .route("/profile")
+  .patch(authMiddleware.guard, usercontrollerfunction.updateProfile);
 
 export default userRouter;
