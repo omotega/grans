@@ -13,6 +13,7 @@ export interface Iuser {
   profilePicture: string | null;
   phoneNumber: string;
   role: string;
+  verified: boolean;
   account?: Account;
   createdAt: Date;
   updatedAt: Date;
