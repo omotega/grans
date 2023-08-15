@@ -1,20 +1,25 @@
 import joi from "joi";
-import { Iuser } from "../utils/interface";
+import { Iuser } from "../types/user";
 
-export const registerValidation = (user: Iuser) => {
+const registerValidation = (user: Iuser) => {
   const schema = joi.object({
     name: joi.string().min(4).max(25).required(),
     email: joi.string().email().required(),
-    password: joi
-      .string().required(),
+    password: joi.string().required(),
+    phoneNumber: joi.string().required(),
   });
   return schema.validate(user);
 };
 
-export const loginValidation = (login:{email:string,password:string}) => {
+const loginValidation = (login: { email: string; password: string }) => {
   const loginschema = joi.object({
-    email: joi.string().email().required(),
+    email: joi.string().required(),
     password: joi.string().required(),
-  })
-  return loginschema.validate(login)
+  });
+  return loginschema.validate(login);
+};
+
+export default {
+  registerValidation,
+  loginValidation,
 };
