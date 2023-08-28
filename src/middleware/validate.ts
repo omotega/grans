@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import userValidation from "../validations/uservalidation";
-import { cardChargeValidation } from "../validations/cardValidation";
+import { cardChargeValidation } from "../validations/fundwallet/cardValidation";
 import httpStatus from "http-status";
 
 const validateRegisterMiddleware = (
