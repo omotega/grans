@@ -1,24 +1,8 @@
-import fetch from "node-fetch";
 import config from "../config/config";
+import transactionshelper from "../helpers/transactions";
 
 const PAYSTACK_BASE_URL = "https://api.paystack.co";
-
-async function sendRequest(payload: {
-  url: string;
-  method: string;
-  body?: object;
-}) {
-  const { url, method, body } = payload;
-  const response = await fetch(url, {
-    method: method,
-    body: JSON.stringify(body),
-    headers: {
-      authorization: `Bearer ${config.PAYSTACK_SECRET_KEY}`,
-    },
-  });
-  const data = await response.json();
-  return data;
-}
+const paystackSecretKey = config.PAYSTACK_SECRET_KEY;
 
 const chargeCard = async (payload: any) => {
   const url = `${PAYSTACK_BASE_URL}/charge`;
@@ -32,7 +16,12 @@ const chargeCard = async (payload: any) => {
     amount: payload.amount,
     email: payload.email,
   };
-  const response = await sendRequest({ url: url, method: "post", body: input });
+  const response = await transactionshelper.sendRequest({
+    url: url,
+    method: "post",
+    body: input,
+    secret: paystackSecretKey,
+  });
   return response;
 };
 
@@ -43,7 +32,12 @@ const submitPin = async (payload: any) => {
     pin: payload.pin,
   };
 
-  const response = await sendRequest({ url: url, method: "post", body: input });
+  const response = await transactionshelper.sendRequest({
+    url: url,
+    method: "post",
+    body: input,
+    secret: paystackSecretKey,
+  });
   return response;
 };
 
@@ -54,13 +48,22 @@ const submitPhone = async (payload: any) => {
     otp: payload.otp,
   };
 
-  const response = await sendRequest({ url: url, method: "post", body: input });
+  const response = await transactionshelper.sendRequest({
+    url: url,
+    method: "post",
+    body: input,
+    secret: paystackSecretKey,
+  });
   return response;
 };
 
 const getBank = async () => {
   const url = `${PAYSTACK_BASE_URL}/bank`;
-  const response = await sendRequest({ url: url, method: "get" });
+  const response = await transactionshelper.sendRequest({
+    url: url,
+    method: "get",
+    secret: paystackSecretKey,
+  });
   return response;
 };
 
@@ -70,14 +73,12 @@ const accountValidityCheck = async (payload: any) => {
     bankCode: payload.bankCode,
   };
   const url = `${PAYSTACK_BASE_URL}/bank/resolve?account_number=${input.accountNumber}&bank_code=${input.bankCode}`;
-  const response = await fetch(url, {
+  const response = await transactionshelper.sendRequest({
+    url: url,
     method: "get",
-    headers: {
-      authorization: `Bearer ${config.PAYSTACK_SECRET_KEY}`,
-    },
+    secret: paystackSecretKey,
   });
-  const data = await response.json();
-  return data;
+  return response;
 };
 
 const createTransferRecipient = async (payload: any) => {
@@ -89,7 +90,12 @@ const createTransferRecipient = async (payload: any) => {
     bank_code: payload.bank_code,
     currency: "NGN",
   };
-  const response = await sendRequest({ url: url, method: "post", body: input });
+  const response = await transactionshelper.sendRequest({
+    url: url,
+    method: "post",
+    body: input,
+    secret: paystackSecretKey,
+  });
   return response;
 };
 
@@ -103,13 +109,22 @@ const initiateTransfer = async (payload: any) => {
     reason: payload.reason,
   };
 
-  const response = await sendRequest({ url: url, method: "post", body: input });
+  const response = await transactionshelper.sendRequest({
+    url: url,
+    method: "post",
+    body: input,
+    secret: paystackSecretKey,
+  });
   return response;
 };
 
 const getBankForBankTransfer = async () => {
   const url = `${PAYSTACK_BASE_URL}/bank?pay_with_bank=true`;
-  const response = await sendRequest({ url: url, method: "get" });
+  const response = await transactionshelper.sendRequest({
+    url: url,
+    method: "get",
+    secret: paystackSecretKey,
+  });
   return response;
 };
 
@@ -126,7 +141,12 @@ const bankTransfer = async (payload: any) => {
     },
   };
 
-  const response = await sendRequest({ url: url, method: "post", body: input });
+  const response = await transactionshelper.sendRequest({
+    url: url,
+    method: "post",
+    body: input,
+    secret: paystackSecretKey,
+  });
   return response;
 };
 

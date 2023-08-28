@@ -11,6 +11,7 @@ import {
   INCREASE_BALANCE_ERROR,
   INSUFFICIENT_BALANCE,
 } from "../utils/constant";
+import { config } from "dotenv";
 
 async function creditAccount(creditData: {
   amount: number;
@@ -78,8 +79,27 @@ async function getUserAccountId(userId: string) {
   return userAccountId;
 }
 
+export async function sendRequest(payload: {
+  url: string;
+  method: string;
+  body?: object;
+  secret: string;
+}) {
+  const { url, method, body, secret } = payload;
+  const response = await fetch(url, {
+    method: method,
+    body: JSON.stringify(body),
+    headers: {
+      authorization: `Bearer ${secret}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+}
+
 export default {
   creditAccount,
   debitAccount,
   getUserAccountId,
+  sendRequest,
 };
