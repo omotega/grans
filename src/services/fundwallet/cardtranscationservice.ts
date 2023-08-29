@@ -5,7 +5,7 @@ import {
   CARD_TRANSACTION_SUCCESSFUL,
   CREDIT_FAILED,
   SOMETHING_HAPPENED,
-  SUBMIT_PHONE,
+  SUBMIT_OTP,
   SUBMIT_PIN,
 } from "../../utils/constant";
 import cardtransactionrrepo from "../../database/repo/cardtransactionrrepo";
@@ -56,9 +56,9 @@ async function fundWalletWithCard(payload: {
   cvv: string;
   email: string;
   amount: number;
-  accountId: string;
+  userId: string;
 }) {
-  const { number, expiry_month, expiry_year, cvv, email, amount, accountId } =
+  const { number, expiry_month, expiry_year, cvv, email, amount, userId } =
     payload;
   const charge = await paystackServices.chargeCard({
     number,
@@ -68,6 +68,7 @@ async function fundWalletWithCard(payload: {
     amount,
     email,
   });
+  const accountId = await transactionhelpers.getUserAccountId(userId);
   if (charge.data.status === "send_pin") {
     const response = await whenPaystackResposeIsSubmitPin({
       amount: amount,
@@ -75,7 +76,11 @@ async function fundWalletWithCard(payload: {
       reference: charge.data.reference,
       status: charge.data.status,
     });
-    return { status: true, message: SUBMIT_PIN };
+    return {
+      status: true,
+      message: SUBMIT_PIN,
+      reference: charge.data.reference,
+    };
   } else if (charge.data.status === "success") {
     const response = await whenPaystackResposeIsSuccess({
       amount: amount,
@@ -125,10 +130,11 @@ async function whenPaystackResposeIsSubmitPhone(payload: {
 async function submitPin(payload: {
   pin: string;
   reference: string;
-  accountId: string;
+  userId: string;
 }) {
-  const { pin, accountId, reference } = payload;
+  const { pin, userId, reference } = payload;
   const charge = await paystackServices.submitPin({ pin, reference });
+  const accountId = await transactionhelpers.getUserAccountId(userId);
   if (charge.data.status === "success") {
     const response = await whenPaystackResponseIsSuccessForSubmitpin({
       amount: charge.data.amount,
@@ -136,14 +142,14 @@ async function submitPin(payload: {
       reference,
       status: charge.data.status,
     });
-
     return { status: true, message: CARD_TRANSACTION_SUCCESSFUL };
   } else if (charge.data.status === "send_otp") {
     const response = await whenPaystackResposeIsSubmitPhone({
       reference,
       status: charge.data.status,
     });
-    return { status: true, message: SUBMIT_PHONE };
+
+    return { status: true, message: SUBMIT_OTP, reference: reference };
   } else {
     throw new Error(SOMETHING_HAPPENED);
   }
@@ -172,9 +178,10 @@ async function whenPaystackResponseIsSuccessForSubmitphone(payload: any) {
 async function submitPhone(payload: {
   otp: string;
   reference: string;
-  accountId: string;
+  userId: string;
 }) {
-  const { otp, reference, accountId } = payload;
+  const { otp, reference, userId } = payload;
+  const accountId = await transactionhelpers.getUserAccountId(userId);
   const charge = await paystackServices.submitPhone({ otp, reference });
   if (charge.data.status === "success") {
     const response = await whenPaystackResponseIsSuccessForSubmitphone({
@@ -183,39 +190,12 @@ async function submitPhone(payload: {
       reference: charge.data.reference,
       status: charge.data.status,
     });
+    console.log(response, "THIS IS THE RESPONSE OOO");
     return { status: true, message: CARD_TRANSACTION_SUCCESSFUL };
   } else {
     throw new Error(SOMETHING_HAPPENED);
   }
 }
-
-// fundWalletWithCard({
-//   number: "5060666666666666666",
-//   cvv: "123",
-//   expiry_month: "07",
-//   expiry_year: "24",
-//   amount: 10000,
-//   email: "tomoyibo@gmail.com",
-//   accountId: "e17441bf-f48a-4e44-8bcb-db1df67e39db",
-// })
-//   .then(console.log)
-//   .catch(console.log);
-
-// submitPin({
-//   pin: "1234",
-//   reference: "wmsac382ze16aik",
-//   accountId: "e17441bf-f48a-4e44-8bcb-db1df67e39db",
-// })
-//   .then(console.log)$
-//   .catch(console.log);
-
-submitPhone({
-  otp: "123456",
-  reference: "wmsac382ze16aik",
-  accountId: "e17441bf-f48a-4e44-8bcb-db1df67e39db",
-})
-  .then(console.log)
-  .catch(console.log);
 
 export default {
   fundWalletWithCard,

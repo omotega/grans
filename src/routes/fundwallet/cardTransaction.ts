@@ -6,13 +6,13 @@ import cardtransasctionscontroller from "../../controllers/fundwallet/card_trans
 import authMiddleware from "../../middleware/auth";
 
 cardTransactionRouter
-  .route("/fundwallet")
+  .route("/chargecard")
   .post(authMiddleware.guard, cardtransasctionscontroller.chargeCard);
 cardTransactionRouter
   .route("/submitpin")
   .post(authMiddleware.guard, cardtransasctionscontroller.submitPin);
 cardTransactionRouter
   .route("/submitotp")
-  .post(authMiddleware.guard, cardtransasctionscontroller.submitPin);
+  .post(authMiddleware.guard, cardtransasctionscontroller.submitOtp);
 
 export default cardTransactionRouter;
