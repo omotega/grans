@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import Otp from "otp-generator";
 import config from "../config/config";
 import { v4 } from "uuid";
+import moment from "moment";
+import crypto from "crypto";
 
 const ACCESS_SECRET = config.ACCESS_TOKEN_SECRET;
 const REFRESH_SECRET = config.REFRESH_TOKEN_SECRET;
@@ -113,6 +115,15 @@ class Helper {
     const reference = v4();
     return reference;
   };
+
+  static generateVtuRequestId = async () => {
+    const result =
+      moment().format("YYYYMMDDHHmm") +
+      "" +
+      crypto.randomBytes(10).toString("hex");
+    return result;
+  };
 }
 
+Helper.generateVtuRequestId().then(console.log).catch(console.log);
 export default Helper;

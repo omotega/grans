@@ -151,6 +151,7 @@ const bankTransfer = async (payload: any) => {
 };
 
 
+
 export default {
   chargeCard,
   submitPin,
