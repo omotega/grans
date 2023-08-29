@@ -1,3 +1,5 @@
+import transactionsHelper from "../../helpers/transactions";
+import { TRANSFER_SUCCESSFUL } from "../../utils/constant";
 import paystackServices from "../paystack";
 
 async function bankTransfer(payload: {
@@ -7,13 +9,15 @@ async function bankTransfer(payload: {
   phone: string;
   token: string;
   bankName: string;
+  userId: string;
 }) {
-  const { email, amount, accountNumber, phone, token, bankName } = payload;
+  const { email, amount, accountNumber, phone, token, bankName, userId } =
+    payload;
   const getbanks = await paystackServices.getBankForBankTransfer();
   const bankDetails = getbanks.data;
   const getBankCode = bankDetails.filter((data: any) => data.name === bankName);
   const bank_code = getBankCode[0].code;
-  console.log(bank_code, "THIS IS THE BANK DETAILS OO");
+  const accountId = await transactionsHelper.getUserAccountId(userId);
   if (bankName === "Kuda Bank") {
     const transfer = await bankTransferForKuda({
       email: email,
@@ -22,6 +26,11 @@ async function bankTransfer(payload: {
       phone: phone,
       token: token,
     });
+    const creditAccount = await transactionsHelper.creditAccount({
+      amount: Number(amount),
+      accountId: accountId,
+    });
+    if (creditAccount.status) return TRANSFER_SUCCESSFUL;
     console.log(transfer, "THIS IS THE TRANSFER RESULT FROM THE BANKTRANSFER");
   } else {
     const transfer = await paystackServices.bankTransfer({
@@ -31,6 +40,11 @@ async function bankTransfer(payload: {
       accountNumber: accountNumber,
       token: token,
     });
+    const creditAccount = await transactionsHelper.creditAccount({
+      amount: Number(amount),
+      accountId: accountId,
+    });
+    if (creditAccount.status) return TRANSFER_SUCCESSFUL;
   }
 }
 
@@ -52,16 +66,8 @@ async function bankTransferForKuda(payload: {
   return transfer;
 }
 
-// bankTransfer({
-//   //   email: "customer@email.com",
-//   //   amount: "100000",
-//   //   code: "50211",
-//   //   phone: "+2348100000000",
-//   //   token: "123456",
-//   bankName: "Kuda Bank",
-// })
-//   .then(console.log)
-//   .catch(console.log);
 
 
-export default bankTransfer;
+export default {
+  bankTransfer,
+};
