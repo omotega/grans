@@ -1,19 +1,15 @@
-import asyncHandler from "express-async-handler";
-import { RequestHandler } from "express";
+import { Request, Response, NextFunction } from "express";
 
-type Handler = RequestHandler<any>;
-type Controller<T extends string> = Record<T, Handler>;
+type AsyncFunction = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => Promise<any>;
 
-export function wrapController<T extends string>(
-  controller: Record<T, any>
-): Controller<T> {
-  const newController = {} as Controller<T>;
-//@ts-ignore
-  Object.keys(controller).forEach((key: T) => {
-    if (typeof controller[key] === "function") {
-      newController[key] = asyncHandler(controller[key]);
-    }
-  });
-  return newController;
-}
+const catchAsync =
+  (execution: AsyncFunction) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    execution(req, res, next).catch(next);
+  };
 
+export default catchAsync;

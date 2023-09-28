@@ -1,37 +1,54 @@
 import { Request, Response, NextFunction } from "express";
-import userValidation from "../validations/uservalidation";
-import { cardChargeValidation } from "../validations/fundwallet/cardValidation";
+import { AppError } from "../utils/error";
 import httpStatus from "http-status";
-
-const validateRegisterMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const payload = req.body;
-  const validate = userValidation.registerValidation(payload);
-  if (validate.error)
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ message: validate.error?.details[0].message });
-  next();
+const options = {
+  stripUnknown: true,
+  abortEarly: false,
+  errors: {
+    wrap: {
+      label: "",
+    },
+  },
 };
 
-const validateLoginMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const payload = req.body;
-  const validate = userValidation.loginValidation(payload);
-  if (validate.error)
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ message: validate.error?.details[0].message });
-  next();
+const validate = (schemas: any, values: any) => {
+  let error = [];
+  for (let paramToValidate of Object.keys(schemas)) {
+    const value = values[paramToValidate];
+    if (value) {
+      const schema = schemas[paramToValidate];
+      let result = schema.validate(values[paramToValidate], options);
+      if (result.error) {
+        error.push(
+          result.error.details.map((detail: any) => `${detail.message}`)
+        );
+      } else {
+        values[paramToValidate] = result.value;
+      }
+    } else {
+      error.push(`${paramToValidate} missing`);
+    }
+  }
+  if (error.length > 0) return { error: error.flat() };
+  return {};
 };
 
-export default {
-  validateLoginMiddleware,
-  validateRegisterMiddleware,
+const validationMiddleware = (requestSchema: any, auth = true) => {
+  const schema = auth
+    ? {
+        ...requestSchema,
+      }
+    : requestSchema;
+  return (req: Request, res: Response, next: NextFunction) => {
+    const { error } = validate(schema, req);
+    if (error) {
+      throw new AppError({
+        httpCode: httpStatus.BAD_REQUEST,
+        description: error[0],
+      });
+    }
+    next();
+  };
 };
+
+export default validationMiddleware;

@@ -7,6 +7,8 @@ import {
 } from "../utils/constant";
 import Helper from "../utils/helper";
 import config from "../config/config";
+import { AppError } from "../utils/error";
+import httpStatus from "http-status";
 
 async function register(payload: {
   name: string;
@@ -17,7 +19,21 @@ async function register(payload: {
 }) {
   const { name, email, password, profilePicture, phoneNumber } = payload;
   const isExist = await userrepo.findUserByEmail(email);
-  if (isExist) throw new Error(USER_ALREADY_EXIST);
+  if (!isExist)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: USER_NOT_FOUND,
+    });
+  if (isExist.phoneNumber == phoneNumber)
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: "user with phone number already exists",
+    });
+  if (isExist)
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: USER_ALREADY_EXIST,
+    });
   const hash = await Helper.hashPassword(password);
   const accountNumber = await Helper.generateRandomUnique6DigitNumber();
   const user = await userrepo.createUser({
@@ -39,9 +55,17 @@ async function register(payload: {
 async function login(payload: { email: string; password: string }) {
   const { email, password } = payload;
   const isUser = await userrepo.findUserByEmail(email);
-  if (!isUser) throw new Error(USER_NOT_FOUND);
+  if (!isUser)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: USER_NOT_FOUND,
+    });
   const isPassword = await Helper.comparePassword(isUser.password, password);
-  if (!isPassword) throw new Error(INCORRECT_PASSWORD);
+  if (!isPassword)
+    throw new AppError({
+      httpCode: httpStatus.BAD_REQUEST,
+      description: INCORRECT_PASSWORD,
+    });
   console.log(config.ACCESS_TOKEN_SECRET);
   const token = await Helper.generateToken({
     _id: isUser.id,
@@ -58,7 +82,11 @@ async function updateProfile(payload: {
 }) {
   const { userId, email, password } = payload;
   const user = await userrepo.findUserById(userId);
-  if (!user) throw new Error(USER_NOT_FOUND);
+  if (!user)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: USER_NOT_FOUND,
+    });
   const updatedUser = await userrepo.updateField({
     userId: userId,
     email: email,
@@ -72,5 +100,3 @@ export default {
   login,
   updateProfile,
 };
-
-

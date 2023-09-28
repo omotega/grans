@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import cardtranscationservice from "../../services/fundwallet/cardtranscationservice";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchasync";
 
-async function chargeCard(req: Request, res: Response) {
+const chargeCard = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.User;
   const { number, expiry_month, expiry_year, cvv, email, amount } = req.body;
   const response = await cardtranscationservice.fundWalletWithCard({
@@ -15,9 +16,9 @@ async function chargeCard(req: Request, res: Response) {
     userId: id,
   });
   res.status(httpStatus.OK).json(response);
-}
+});
 
-const submitPin = async (req: Request, res: Response) => {
+const submitPin = catchAsync(async (req: Request, res: Response) => {
   const { pin, reference } = req.body;
   const { id } = req.User;
   const response = await cardtranscationservice.submitPin({
@@ -26,9 +27,9 @@ const submitPin = async (req: Request, res: Response) => {
     reference,
   });
   res.status(httpStatus.OK).json(response);
-};
+});
 
-const submitOtp = async (req: Request, res: Response) => {
+const submitOtp = catchAsync(async (req: Request, res: Response) => {
   const { otp, reference } = req.body;
   const { id } = req.User;
   const response = await cardtranscationservice.submitPhone({
@@ -37,7 +38,7 @@ const submitOtp = async (req: Request, res: Response) => {
     reference,
   });
   res.status(httpStatus.OK).json(response);
-};
+});
 
 export default {
   chargeCard,

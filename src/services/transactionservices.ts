@@ -1,3 +1,4 @@
+import httpStatus from "http-status";
 import transactionhelpers from "../helpers/transactions";
 import {
   DEPOSIT_NOT_SUCCESSFUL,
@@ -9,6 +10,7 @@ import {
 } from "../utils/constant";
 import Helper from "../utils/helper";
 import paystackService from "./paystack";
+import { AppError } from "../utils/error";
 
 async function deposit(payload: { accountId: string; amount: number }) {
   const { accountId, amount } = payload;
@@ -17,7 +19,11 @@ async function deposit(payload: { accountId: string; amount: number }) {
     amount: amount,
     purpose: "DEPOSIT",
   });
-  if (!credit.status) throw new Error(DEPOSIT_NOT_SUCCESSFUL);
+  if (!credit.status)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: DEPOSIT_NOT_SUCCESSFUL,
+    });
   return { status: true, message: DEPOSIT_SUCCESSFUL };
 }
 
@@ -104,17 +110,13 @@ async function withdrawl(payload: { accountId: string; amount: number }) {
     accountId: accountId,
     purpose: "WITHDRAWL",
   });
-  if (!debit.success) throw new Error(WITHDRAWL_SUCCESS_ERROR);
+  if (!debit.success)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: WITHDRAWL_SUCCESS_ERROR,
+    });
   return { status: true, message: WITHDRAWL_SUCCESSFUL };
 }
-
-// transfer({
-//   accountNumber: "0704864120",
-//   bankName: "Access Bank",
-//   amount: 10000,
-// })
-//   .then(console.log)
-//   .catch(console.log);
 
 export default {
   deposit,

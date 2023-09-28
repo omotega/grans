@@ -1,12 +1,19 @@
 import app from "./app";
 import dotenv from "dotenv";
+import http from "http";
+import { createHttpTerminator } from "http-terminator";
 dotenv.config();
 
 import logger from "./logger/logger";
 
 const port = process.env.PORT || 6666;
 
-const server = app.listen(port, async () => {
+export const server = http.createServer(app);
+export const httpTerminator = createHttpTerminator({
+  server,
+});
+
+server.listen(port, async () => {
   logger.info(`server connected on port ${port}`);
 });
 

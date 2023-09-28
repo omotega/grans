@@ -1,8 +1,9 @@
 import httpStatus from "http-status";
 import bankTransferServices from "../../services/fundwallet/banktransfer";
 import { Request, Response } from "express";
+import catchAsync from "../../utils/catchasync";
 
-const bankTransfer = async (req: Request, res: Response) => {
+const bankTransfer = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.User;
   const { email, amount, accountNumber, phone, token, bankName } = req.body;
   const response = await bankTransferServices.bankTransfer({
@@ -15,7 +16,7 @@ const bankTransfer = async (req: Request, res: Response) => {
     userId: id,
   });
   res.status(httpStatus.OK).json(response);
-};
+});
 
 export default {
   bankTransfer,

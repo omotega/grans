@@ -7,8 +7,9 @@ import {
   SIGNUP_SUCCESSFUL,
   USER_PROFILE_UPDATE_SUCCESFUL,
 } from "../utils/constant";
+import catchAsync from "../utils/catchasync";
 
-const Register = async (req: Request, res: Response) => {
+const Register = catchAsync(async (req: Request, res: Response) => {
   const { name, email, password, profilePicture, phoneNumber } = req.body;
   const response = await userservices.register({
     name,
@@ -21,9 +22,9 @@ const Register = async (req: Request, res: Response) => {
     message: SIGNUP_SUCCESSFUL,
     user: Helper.excludeFields(["password"], response),
   });
-};
+});
 
-const login = async (req: Request, res: Response) => {
+const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const response = await userservices.login({
     email: email,
@@ -33,9 +34,9 @@ const login = async (req: Request, res: Response) => {
     message: LOGIN_SUCCESSFUL,
     user: Helper.excludeFields(["password"], response),
   });
-};
+});
 
-const updateProfile = async (req: Request, res: Response) => {
+const updateProfile = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.User;
   const { email, password } = req.body;
   const hash = await Helper.hashPassword(password);
@@ -48,7 +49,7 @@ const updateProfile = async (req: Request, res: Response) => {
     message: USER_PROFILE_UPDATE_SUCCESFUL,
     user: Helper.excludeFields(["password"], response),
   });
-};
+});
 
 export default {
   Register,
