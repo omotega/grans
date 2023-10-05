@@ -116,6 +116,12 @@ class Helper {
     return reference;
   };
 
+  static genTransactionRef = () => {
+    const value = v4();
+    const apikey = `Grans_${value}`;
+    return apikey;
+  };
+
   static generateVtuRequestId = async () => {
     const result =
       moment().format("YYYYMMDDHHmm") +

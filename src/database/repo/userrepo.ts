@@ -1,3 +1,4 @@
+import { emit } from "process";
 import { Iuser } from "../../types/user";
 import db from "../dbconnection";
 
@@ -18,18 +19,29 @@ async function findUserByRole(payload: { userId: string; role: any }) {
   return db.user.findUnique({ where: { id: userId, role: role } });
 }
 
-async function updateField(payload: {
-  userId: string;
-  password?: string;
-  email?: string;
+async function findUserByPhoneAndEmail(payload: {
+  phone: string;
+  email: string;
 }) {
-  const { userId, password, email } = payload;
+  const { phone, email } = payload;
+  return db.user.findUnique({ where: { phoneNumber: phone, email: email } });
+}
+
+async function updateField(payload: { userId: string; name: string }) {
+  const { userId, name } = payload;
   return db.user.update({
     where: { id: userId },
-    data: { password: password, email: email },
+    data: { name: name },
   });
 }
 
+async function updateUserStatus(payload: { userId: string; status: false }) {
+  const { userId, status } = payload;
+  return db.user.update({
+    where: { id: userId },
+    data: { verified: status },
+  });
+}
 
 export default {
   findUserByEmail,
@@ -37,4 +49,6 @@ export default {
   findUserById,
   findUserByRole,
   updateField,
+  findUserByPhoneAndEmail,
+  updateUserStatus,
 };

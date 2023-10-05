@@ -11,6 +11,7 @@ import {
 import cardtransactionrrepo from "../../database/repo/cardtransactionrrepo";
 import { AppError } from "../../utils/error";
 import httpStatus from "http-status";
+import Helper from "../../utils/helper";
 
 async function whenPaystackResposeIsSubmitPin(payload: {
   amount: number;
@@ -25,10 +26,11 @@ async function whenPaystackResposeIsSubmitPin(payload: {
     amount: amount,
     lastResponse: status,
   });
-  if (!card_transaction)   throw new AppError({
-    httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-    description: CARD_TRANSACTION_ERROR,
-  });
+  if (!card_transaction)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: CARD_TRANSACTION_ERROR,
+    });
 }
 
 async function whenPaystackResposeIsSuccess(payload: {
@@ -44,17 +46,25 @@ async function whenPaystackResposeIsSuccess(payload: {
     accountId: accountId,
     purpose: "CARDFUNDING",
   });
-  if (!credit.status) throw new Error(CREDIT_FAILED);
+  if (!credit.status)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: CREDIT_FAILED,
+    });
+  const transactionRef = Helper.genTransactionRef();
   const card_transaction = await cardtransactionrrepo.createCardtransaction({
     externalReference: reference,
     accountId: accountId,
     amount: amount,
     lastResponse: status,
+    transactionRef: transactionRef,
   });
-  if (!card_transaction) throw new AppError({
-    httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-    description: CARD_TRANSACTION_ERROR,
-  });;
+  if (!card_transaction)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: CARD_TRANSACTION_ERROR,
+    });
+  return card_transaction;
 }
 
 async function fundWalletWithCard(payload: {
@@ -96,12 +106,16 @@ async function fundWalletWithCard(payload: {
       reference: charge.data.reference,
       status: charge.data.status,
     });
-    return { status: true, message: CARD_TRANSACTION_SUCCESSFUL };
+    return {
+      status: true,
+      message: CARD_TRANSACTION_SUCCESSFUL,
+      data: { transactionReference: response.transactionRef },
+    };
   } else {
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: SOMETHING_HAPPENED,
-    });;
+    });
   }
 }
 
@@ -116,19 +130,21 @@ async function whenPaystackResponseIsSuccessForSubmitpin(payload: any) {
       externalReference: reference,
     },
   });
-  if (!credit.status) throw new AppError({
-    httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-    description: CREDIT_FAILED,
-  });;
+  if (!credit.status)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: CREDIT_FAILED,
+    });
   const card_transaction =
     await cardtransactionrrepo.updateCardtransactionByReference(
       reference,
       status
     );
-  if (!card_transaction) throw new AppError({
-    httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-    description: CARD_TRANSACTION_ERROR,
-  });
+  if (!card_transaction)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: CARD_TRANSACTION_ERROR,
+    });
 }
 
 async function whenPaystackResposeIsSubmitPhone(payload: {
@@ -141,10 +157,11 @@ async function whenPaystackResposeIsSubmitPhone(payload: {
       reference,
       status
     );
-  if (!card_transaction) throw new AppError({
-    httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-    description: CARD_TRANSACTION_ERROR,
-  });
+  if (!card_transaction)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: CARD_TRANSACTION_ERROR,
+    });
 }
 
 async function submitPin(payload: {
@@ -189,19 +206,21 @@ async function whenPaystackResponseIsSuccessForSubmitphone(payload: any) {
       externalReference: reference,
     },
   });
-  if (!credit.status) throw new AppError({
-    httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-    description: CREDIT_FAILED,
-  });;
+  if (!credit.status)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: CREDIT_FAILED,
+    });
   const card_transaction =
     await cardtransactionrrepo.updateCardtransactionByReference(
       reference,
       status
     );
-  if (!card_transaction) throw new AppError({
-    httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-    description: CARD_TRANSACTION_ERROR,
-  });
+  if (!card_transaction)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: CARD_TRANSACTION_ERROR,
+    });
 }
 
 async function submitPhone(payload: {

@@ -11,11 +11,11 @@ import {
   INCREASE_BALANCE_ERROR,
   INSUFFICIENT_BALANCE,
 } from "../utils/constant";
-import { config } from "dotenv";
 
 async function creditAccount(creditData: {
   amount: number;
   accountId: string;
+  transctionRef?:string;
   purpose?: string;
   reference?: string;
   metadata?: any;
@@ -34,6 +34,7 @@ async function creditAccount(creditData: {
     amount: creditData.amount,
     accountId: creditData.accountId,
     metadata: creditData.metadata,
+    transactionRef: creditData.transctionRef,
     reference: reference,
     balanceBefore: Number(account.balance),
     balanceAfter: Number(account.balance) + Number(creditData.amount),
@@ -47,6 +48,7 @@ async function debitAccount(debitData: {
   amount: number;
   purpose?: string;
   reference?: string;
+  transctionRef?:string;
   metadata?: any;
 }) {
   const account = await accountrepo.findAccountById(debitData.accountId);
@@ -63,6 +65,7 @@ async function debitAccount(debitData: {
     txnType: "DEBIT",
     purpose: debitData.purpose,
     accountId: debitData.accountId,
+    transctionRef:debitData.transctionRef,
     reference: v4(),
     metadata: debitData.metadata,
     balanceBefore: Number(account.balance),
