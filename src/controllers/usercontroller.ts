@@ -38,12 +38,10 @@ const login = catchAsync(async (req: Request, res: Response) => {
 
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.User;
-  const { email, password } = req.body;
-  const hash = await Helper.hashPassword(password);
+  const { name } = req.body;
   const response = await userservices.updateProfile({
     userId: id,
-    email: email,
-    password: hash,
+    name: name,
   });
   res.status(httpStatus.OK).json({
     message: USER_PROFILE_UPDATE_SUCCESFUL,
