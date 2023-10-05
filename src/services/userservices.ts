@@ -18,17 +18,10 @@ async function register(payload: {
   phoneNumber: string;
 }) {
   const { name, email, password, profilePicture, phoneNumber } = payload;
-  const isExist = await userrepo.findUserByEmail(email);
-  if (!isExist)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: USER_NOT_FOUND,
-    });
-  if (isExist.phoneNumber == phoneNumber)
-    throw new AppError({
-      httpCode: httpStatus.CONFLICT,
-      description: "user with phone number already exists",
-    });
+  const isExist = await userrepo.findUserByPhoneAndEmail({
+    phone: phoneNumber,
+    email: email,
+  });
   if (isExist)
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
@@ -75,12 +68,8 @@ async function login(payload: { email: string; password: string }) {
   return response;
 }
 
-async function updateProfile(payload: {
-  userId: string;
-  email?: string;
-  password?: string;
-}) {
-  const { userId, email, password } = payload;
+async function updateProfile(payload: { userId: string; name: string }) {
+  const { userId, name } = payload;
   const user = await userrepo.findUserById(userId);
   if (!user)
     throw new AppError({
@@ -89,8 +78,7 @@ async function updateProfile(payload: {
     });
   const updatedUser = await userrepo.updateField({
     userId: userId,
-    email: email,
-    password: password,
+    name: name,
   });
   return updatedUser;
 }
