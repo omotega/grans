@@ -1,7 +1,6 @@
 import "express-async-errors";
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
 
 import httpLogger from "./logger/httplogger";
 import { CustomRequest } from "./types/customrequest";
@@ -14,7 +13,6 @@ const app = express();
 app.use(httpLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 declare global {
   namespace Express {
