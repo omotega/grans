@@ -1,4 +1,4 @@
-import {  Router, Request, Response, NextFunction  } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import userRouter from "./user";
 import transactionRouter from "./transaction";
 import cardTransactionRouter from "./fundwallet/cardTransaction";
@@ -13,13 +13,13 @@ route.use("/cardtransaction", cardTransactionRouter);
 route.use("/fundwallet", bankTransferRouter);
 
 route.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.log("Error encountered:", err.message || err);
-  
-    next(err);
-  });
-  
-  route.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    errorHandler.handleError(err, res);
-  });
+  console.log("Error encountered:", err.message || err);
+
+  next(err);
+});
+
+route.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  errorHandler.handleError(err, res);
+});
 
 export default route;
