@@ -6,7 +6,6 @@ import {
   USER_NOT_FOUND,
 } from "../utils/constant";
 import Helper from "../utils/helper";
-import config from "../config/config";
 import { AppError } from "../utils/error";
 import httpStatus from "http-status";
 
@@ -59,7 +58,6 @@ async function login(payload: { email: string; password: string }) {
       httpCode: httpStatus.BAD_REQUEST,
       description: INCORRECT_PASSWORD,
     });
-  console.log(config.ACCESS_TOKEN_SECRET);
   const token = await Helper.generateToken({
     _id: isUser.id,
     role: isUser.role,

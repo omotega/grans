@@ -20,11 +20,13 @@ async function whenPaystackResposeIsSubmitPin(payload: {
   status: string;
 }) {
   const { amount, accountId, reference, status } = payload;
+  const transactionRef = Helper.genTransactionRef();
   const card_transaction = await cardtransactionrrepo.createCardtransaction({
     externalReference: reference,
     accountId: accountId,
     amount: amount,
     lastResponse: status,
+    transactionRef: transactionRef,
   });
   if (!card_transaction)
     throw new AppError({
@@ -145,6 +147,7 @@ async function whenPaystackResponseIsSuccessForSubmitpin(payload: any) {
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: CARD_TRANSACTION_ERROR,
     });
+  return card_transaction;
 }
 
 async function whenPaystackResposeIsSubmitPhone(payload: {
@@ -179,7 +182,10 @@ async function submitPin(payload: {
       reference,
       status: charge.data.status,
     });
-    return { status: true, message: CARD_TRANSACTION_SUCCESSFUL };
+    return {
+      status: true,
+      message: CARD_TRANSACTION_SUCCESSFUL,
+    };
   } else if (charge.data.status === "send_otp") {
     const response = await whenPaystackResposeIsSubmitPhone({
       reference,
@@ -238,7 +244,6 @@ async function submitPhone(payload: {
       reference: charge.data.reference,
       status: charge.data.status,
     });
-    console.log(response, "THIS IS THE RESPONSE OOO");
     return { status: true, message: CARD_TRANSACTION_SUCCESSFUL };
   } else {
     throw new AppError({
