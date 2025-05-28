@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import cardtranscationservice from "../../services/fundwallet/cardtranscationservice";
+import cardtranscationservice from "../services/cardtranscationservice";
 import httpStatus from "http-status";
-import catchAsync from "../../utils/catchasync";
+import catchAsync from "../utils/catchasync";
 
 const chargeCard = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.User;

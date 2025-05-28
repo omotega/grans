@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import transactionservices from "../services/transactionservices";
+import transactionservices from "../services/transaction.services";
 import httpStatus from "http-status";
 import catchAsync from "../utils/catchasync";
 

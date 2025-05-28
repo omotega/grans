@@ -15,7 +15,7 @@ import {
 async function creditAccount(creditData: {
   amount: number;
   accountId: string;
-  transctionRef?:string;
+  transctionRef?: string;
   purpose?: string;
   reference?: string;
   metadata?: any;
@@ -48,7 +48,7 @@ async function debitAccount(debitData: {
   amount: number;
   purpose?: string;
   reference?: string;
-  transctionRef?:string;
+  transctionRef?: string;
   metadata?: any;
 }) {
   const account = await accountrepo.findAccountById(debitData.accountId);
@@ -65,7 +65,7 @@ async function debitAccount(debitData: {
     txnType: "DEBIT",
     purpose: debitData.purpose,
     accountId: debitData.accountId,
-    transctionRef:debitData.transctionRef,
+    transctionRef: debitData.transctionRef,
     reference: v4(),
     metadata: debitData.metadata,
     balanceBefore: Number(account.balance),
@@ -86,7 +86,7 @@ export async function sendRequest(payload: {
   url: string;
   method: string;
   body?: object;
-  secret: string;
+  secret?: string;
 }) {
   const { url, method, body, secret } = payload;
   const response = await fetch(url, {

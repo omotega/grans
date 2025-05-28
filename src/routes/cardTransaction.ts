@@ -2,8 +2,8 @@ import { Router } from "express";
 
 const cardTransactionRouter = Router();
 
-import cardtransasctionscontroller from "../../controllers/fundwallet/card_transasctions";
-import authMiddleware from "../../middleware/auth";
+import cardtransasctionscontroller from "../controllers/card_transasctions";
+import authMiddleware from "../middleware/auth";
 
 cardTransactionRouter
   .route("/chargecard")

@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
 import userRouter from "./user";
 import transactionRouter from "./transaction";
-import cardTransactionRouter from "./fundwallet/cardTransaction";
-import bankTransferRouter from "./fundwallet/banktransfer";
+import cardTransactionRouter from "./cardTransaction";
+import bankTransferRouter from "./banktransfer";
 import { errorHandler } from "../middleware/errors/errorhandler";
 
 const route = Router();

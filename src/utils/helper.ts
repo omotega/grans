@@ -7,7 +7,6 @@ import moment from "moment";
 import crypto from "crypto";
 
 const ACCESS_SECRET = config.ACCESS_TOKEN_SECRET;
-const REFRESH_SECRET = config.REFRESH_TOKEN_SECRET;
 
 /**
  * contains all the helper methods
@@ -45,9 +44,9 @@ class Helper {
 
     return token;
   }
-  static generateRefreshToken = async (payload: any) => {
-    await Helper.generateToken(payload, config.REFRESH_TOKEN_SECRET);
-  };
+  // static generateRefreshToken = async (payload: any) => {
+  //   await Helper.generateToken(payload, config.REFRESH_TOKEN_SECRET);
+  // };
 
   static generateAccesToken = async (payload: any) => {
     await Helper.generateToken(payload, config.ACCESS_TOKEN_SECRET);
@@ -88,7 +87,6 @@ class Helper {
     const result = Object.fromEntries(
       Object.entries(objects).filter((e) => !exclude.has(e[0]))
     );
-
     return result;
   };
 
@@ -121,15 +119,6 @@ class Helper {
     const apikey = `Grans_${value}`;
     return apikey;
   };
-
-  static generateVtuRequestId = async () => {
-    const result =
-      moment().format("YYYYMMDDHHmm") +
-      "" +
-      crypto.randomBytes(10).toString("hex");
-    return result;
-  };
 }
 
-Helper.generateVtuRequestId().then(console.log).catch(console.log);
 export default Helper;

@@ -1,5 +1,5 @@
 import "express-async-errors";
-import express, { Express, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 
 import httpLogger from "./logger/httplogger";

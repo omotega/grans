@@ -9,14 +9,14 @@
     "dev": " nodemon ./src/server.ts",
     "start": "cross-env NODE_ENV=production nodemon ./src/server.ts",
     "build": "tsc",
-    "migrate": "npx prisma migrate dev --name init",
-    "migrate:undo": " cross-env NODE_ENV=development && npx sequelize-cli db:migrate:undo:all"
+    "migrate": "npx prisma migrate dev --name init"
   },
   "dependencies": {
     "@faker-js/faker": "^7.6.0",
     "@prisma/client": "5.0.0",
     "@sendgrid/mail": "^7.7.0",
     "argon2": "^0.30.2",
+    "axios": "^1.6.5",
     "cross-env": "^7.0.3",
     "date-fns": "^2.29.3",
     "dotenv": "^16.0.3",

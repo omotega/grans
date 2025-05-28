@@ -21,7 +21,7 @@ async function deposit(payload: { accountId: string; amount: number }) {
   });
   if (!credit.status)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      httpCode: httpStatus.BAD_GATEWAY,
       description: DEPOSIT_NOT_SUCCESSFUL,
     });
   return { status: true, message: DEPOSIT_SUCCESSFUL };

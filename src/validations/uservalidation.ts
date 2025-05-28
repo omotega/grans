@@ -5,7 +5,7 @@ const registerValidation = {
     name: joi.string().min(4).max(25).required(),
     email: joi.string().email().required(),
     password: joi.string().required(),
-    phoneNumber: joi.string().required(),
+    phoneNumber: joi.string().length(11).required(),
   }),
 };
 
@@ -15,8 +15,6 @@ const loginValidation = {
     password: joi.string().required(),
   }),
 };
-
-
 
 export default {
   registerValidation,
